@@ -46,13 +46,20 @@
     // )
 
     // $effect(() => console.log($store))
-
+    //
+    let nowPlaying = $state(null)
 
 </script>
 
+{#if nowPlaying}
+	<audio controls src="http://localhost:8000/track/{nowPlaying.id}" autoplay></audio>
+{:else}
+<p>Nothing playing</p>
+{/if}
+
 {#each $GetFlacTracks.data.tracks.nodes as track (track.recordingId)}
     <!-- <p>{JSON.stringify(track)}</p> -->
-    <Track track={track}/>
+    <Track track={track} onclick={() => nowPlaying = track}/>
 
 {/each}
 <!-- {JSON.stringify($GetFlacTracks)} -->
