@@ -16,6 +16,7 @@ query GetFlacTracks {
             # artistIds
             # workIds
             recordingId
+            id
         }
         # pageInfo tells you if there are more tracks
         pageInfo {
