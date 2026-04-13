@@ -1,27 +1,28 @@
-query GetFlacTracks {
+query GetFlacTracks($cursor: String, $order: OrderByEnum = ASC) {
     tracks(
         filters: { filename: { ends_with: ".flac" } }
-        pagination: { cursor: { limit: 100 } }
-    ) @paginate(mode: SinglePage) {
-        # nodes contains the actual track data
+        pagination: { cursor: { limit: 100 cursor: $cursor }  }
+        orderBy: {
+            id: $order
+        }
+
+    ) {
         nodes {
             filePath
-            # filename
             title
             artist
             album
             date
             trackNumber
             durationSecs
-            # artistIds
-            # workIds
             recordingId
             id
         }
-        # pageInfo tells you if there are more tracks
         pageInfo {
             hasNextPage
+            hasPreviousPage
             endCursor
+            startCursor
         }
     }
 }
