@@ -38,8 +38,10 @@
         <p>Album: {track?.album}</p>
         <p>Genre: {track?.genre}</p>
         </div>
-        <div class="track">
+        <div class="scrubber">
         <audio controls src="http://localhost:8000/track/{track.id}" autoplay bind:currentTime={player.currentTime} bind:paused={player.paused}></audio>
+        </div>
+        <div class="queue">
         </div>
     </div>
 {:else}
@@ -52,5 +54,19 @@
         background: #f0f0f0;
         border-radius: 8px;
         margin-bottom: 1rem;
+
+        display: grid;
+        grid-auto-columns: 1fr;
+        grid-template-columns: 1.2fr 0.8fr;
+        grid-template-rows: 1fr auto;
+        gap: 0px 0px;
+        grid-template-areas:
+          "track queue"
+          "scrubber queue";
     }
+    .track-info {
+        grid-area: track;
+    }
+    .queue { grid-area: queue; }
+    .scrubber { grid-area: scrubber; }
 </style>
