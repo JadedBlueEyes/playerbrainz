@@ -15,6 +15,27 @@
                     album
                     durationSecs
                     genre
+
+                    trackMedia (filters:  {
+                        usage:  {
+                           eq: "FrontCover"
+                        }
+
+                    } orderBy:  {
+                       visualIndex: ASC
+                    } pagination:  {
+                        page:  {
+                           limit: 1
+                        }
+                    }) {
+                      nodes {
+                        id
+                        usage
+                        mediaType
+                        colorMode
+                        visualIndex
+                      }
+                    }
                 }
             }
         }
@@ -25,7 +46,9 @@
             trackQuery.fetch({ variables: { id: player.currentTrackId } });
         }
     });
-
+    $effect(() => {
+        console.log($trackQuery.data)
+    })
     function handleEnded() {
         player.nextTrack();
     }
@@ -41,6 +64,9 @@
         <p>Artist: {track?.artist}</p>
         <p>Album: {track?.album}</p>
         <p>Genre: {track?.genre}</p>
+        {#if track?.trackMedia?.nodes[0]}
+            <img class="cover" src="http://localhost:8000/media/{track?.trackMedia?.nodes[0].id}">
+        {/if}
         </div>
         <div class="scrubber">
         <audio controls src="http://localhost:8000/track/{track.id}" autoplay bind:currentTime={player.currentTime} bind:paused={player.paused} onended={handleEnded}></audio>
@@ -81,4 +107,5 @@
     }
     .queue { grid-area: queue; }
     .scrubber { grid-area: scrubber; }
+    .cover {max-width: 100%; width: 16em}
 </style>
