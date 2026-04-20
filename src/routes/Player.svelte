@@ -25,6 +25,10 @@
             trackQuery.fetch({ variables: { id: player.currentTrackId } });
         }
     });
+
+    function handleEnded() {
+        player.nextTrack();
+    }
 </script>
 
 {#if $trackQuery.fetching}
@@ -39,9 +43,17 @@
         <p>Genre: {track?.genre}</p>
         </div>
         <div class="scrubber">
-        <audio controls src="http://localhost:8000/track/{track.id}" autoplay bind:currentTime={player.currentTime} bind:paused={player.paused}></audio>
+        <audio controls src="http://localhost:8000/track/{track.id}" autoplay bind:currentTime={player.currentTime} bind:paused={player.paused} onended={handleEnded}></audio>
         </div>
         <div class="queue">
+            <h3>Queue</h3>
+            {#if player.queue && player.queue.length > 0}
+                <ol>
+                    {#each player.queue as queueId, index}
+                        <li style={index === player.queueIndex ? "font-weight: bold;" : ""}>Track ID: {queueId}</li>
+                    {/each}
+                </ol>
+            {/if}
         </div>
     </div>
 {:else}

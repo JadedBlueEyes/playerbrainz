@@ -1,16 +1,17 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
 	import { setContext, onMount } from 'svelte';
+	import { Player } from '$lib/player.svelte';
 
 	let { children } = $props();
 
-	let player = $state({} as any);
+	let player = new Player();
 
 	onMount(() => {
 		const stored = localStorage.getItem('playerState');
 		if (stored) {
 			try {
-				Object.assign(player, JSON.parse(stored));
+				player.load(JSON.parse(stored));
 			} catch (e) {
 				console.error("Failed to parse player state", e);
 			}

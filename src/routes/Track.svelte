@@ -26,10 +26,14 @@
     )
 
     function handleclick() {
-        player().currentTrackId = $data.id;
-        player().currentTime = 0;
+        player().playTrack($data.id);
+    }
+
+    function handlecontextmenu(e: MouseEvent) {
+        e.preventDefault();
+        player().addTrackToQueue($data.id);
     }
 </script>
 
 <!-- <img src="https://coverartarchive.org/release/{$data.recordingId}/front" loading="lazy"> -->
-<p data-id={$data.recordingId} onclick={handleclick}><em>{$data.title}</em> by <em>{$data.artist}</em> from <em>{$data.album}</em></p>
+<p data-id={$data.recordingId} onclick={handleclick} oncontextmenu={handlecontextmenu}><em>{$data.title}</em> by <em>{$data.artist}</em> from <em>{$data.album}</em></p>
