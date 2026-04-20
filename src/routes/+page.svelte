@@ -2,6 +2,9 @@
     import type { PageData } from './$houdini'
     import Player from './Player.svelte';
     import Track from "./Track.svelte";
+    import { getContext } from 'svelte';
+
+    let getPlayer: any = getContext('player');
 
     interface Props {
         data: PageData

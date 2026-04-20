@@ -3,6 +3,7 @@
     import { graphql } from '$houdini';
 
     let getPlayer: any = getContext('player');
+    let player = getPlayer();
 
     let trackQuery = graphql(`
         query GetTrackDetails($id: Int!) {
@@ -20,7 +21,6 @@
     `);
 
     $effect(() => {
-        let player = getPlayer();
         if (player.currentTrackId) {
             trackQuery.fetch({ variables: { id: player.currentTrackId } });
         }
@@ -32,11 +32,15 @@
 {:else if $trackQuery.data?.tracks?.nodes?.[0]}
     {@const track = $trackQuery.data.tracks.nodes[0]}
     <div class="player">
+        <div class="track-info">
         <h2>Currently Playing: {track?.title}</h2>
         <p>Artist: {track?.artist}</p>
         <p>Album: {track?.album}</p>
         <p>Genre: {track?.genre}</p>
-        <audio controls src="http://localhost:8000/track/{track.id}" autoplay></audio>
+        </div>
+        <div class="track">
+        <audio controls src="http://localhost:8000/track/{track.id}" autoplay bind:currentTime={player.currentTime} bind:paused={player.paused}></audio>
+        </div>
     </div>
 {:else}
     <p>Nothing playing.</p>

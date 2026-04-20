@@ -5,7 +5,7 @@
     let player: any = getContext('player');
 
     interface Props {
-        track: TrackFragment;
+        track: any;
     }
 
     let { track }: Props = $props();
