@@ -27,6 +27,7 @@
 
     function handleclick() {
         player().currentTrackId = $data.id;
+        player().currentTime = 0;
     }
 </script>
 
