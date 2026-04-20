@@ -1,16 +1,16 @@
 <script lang="ts">
     import type { PageData } from './$houdini'
+    import Player from './Player.svelte';
     import Track from "./Track.svelte";
 
     interface Props {
         data: PageData
     }
+
     let { data } = $props()
     let { GetFlacTracks } = $derived(data);
 
     let dir: "prev" | "next" = "next"
-
-    let nowPlaying: NonNullable<Awaited<ReturnType<PageData['GetFlacTracks']['fetch']>>['data']>['tracks']['nodes'][number] | null = $state(null)
 
     async function prevPage() {
         console.log($GetFlacTracks.data?.tracks.pageInfo.startCursor)
@@ -25,18 +25,14 @@
         dir = "next"
     }
 
-    $effect(() => console.log($GetFlacTracks.data?.tracks.pageInfo))
 </script>
 
-{#if nowPlaying}
-	<audio controls src="http://localhost:8000/track/{nowPlaying.id}" autoplay></audio>
-{:else}
-<p>Nothing playing</p>
-{/if}
+<Player></Player>
+
 
 {#if $GetFlacTracks.data?.tracks?.nodes}
     {#each $GetFlacTracks.data.tracks.nodes as track (track.recordingId)}
-        <Track track={track} onclick={() => nowPlaying = track}/>
+        <Track track={track}/>
     {/each}
 {/if}
 
