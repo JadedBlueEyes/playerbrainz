@@ -1,4 +1,4 @@
-use clap::{Args, Parser};
+use clap::Parser;
 use std::{fs::File, path::Path};
 use symphonia::core::{
     formats::{FormatOptions, probe::Hint},
@@ -9,13 +9,13 @@ use symphonia::core::{
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 #[command(propagate_version = true)]
-struct Metatata {
+struct Metadata {
     #[arg(value_name = "FILE")]
     pub file_path: String,
 }
 
 fn main() {
-    let cli = Metatata::parse();
+    let cli = Metadata::parse();
 
     let mut hint = Hint::new();
     let path = Path::new(&cli.file_path);
