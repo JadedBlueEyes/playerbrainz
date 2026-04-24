@@ -56,7 +56,7 @@
 
 <div class="track">
 {#if $data?.trackMedia?.nodes[0]}
-    <img class="cover" src="http://localhost:8000/media/{track?.trackMedia?.nodes[0].id}">
+    <img class="cover" src="http://localhost:8000/media/{track?.trackMedia?.nodes[0].id}" decoding="async">
 {/if}
 
 <p data-id={$data.recordingId} onclick={handleclick} oncontextmenu={handlecontextmenu}><em>{$data.title}</em> by <em>{$data.artist}</em> from <em>{$data.album}</em></p>
