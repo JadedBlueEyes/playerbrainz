@@ -21,11 +21,12 @@
                            eq: "FrontCover"
                         }
 
-                    } orderBy:  {
+                    } orderBy: {
                        visualIndex: ASC
                     } pagination:  {
                         page:  {
                            limit: 1
+                           page: 0
                         }
                     }) {
                       nodes {

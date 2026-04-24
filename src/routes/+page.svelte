@@ -32,13 +32,13 @@
 
 <Player></Player>
 
-
-{#if $GetFlacTracks.data?.tracks?.nodes}
-    {#each $GetFlacTracks.data.tracks.nodes as track (track.recordingId)}
-        <Track track={track}/>
-    {/each}
-{/if}
-
+<div class="tracks">
+    {#if $GetFlacTracks.data?.tracks?.nodes}
+        {#each $GetFlacTracks.data.tracks.nodes as track (track.recordingId)}
+            <Track track={track}/>
+        {/each}
+    {/if}
+</div>
 <button
     disabled={!$GetFlacTracks.data?.tracks.pageInfo.hasPreviousPage}
     onclick={prevPage}
@@ -48,3 +48,10 @@
     disabled={!$GetFlacTracks.data?.tracks.pageInfo.hasNextPage}
     onclick={nextPage}
 > Next </button>
+<style>
+    .tracks {
+        display: flex;
+        flex-flow: column wrap;
+        flex-wrap: wrap;
+    }
+</style>

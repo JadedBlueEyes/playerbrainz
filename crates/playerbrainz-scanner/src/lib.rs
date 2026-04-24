@@ -39,7 +39,7 @@ pub fn read_directory(dir: impl AsRef<Path>, tx: mpsc::UnboundedSender<ScanItem>
             continue;
         }
 
-        // TODO: parallelize reads?
+        // TODO: parallelize reads? Perhaps dump it as the outer process's responsibility so it can read a directory at a time without having to do a threadpool inside spawn_blocking.
         match try_read_mastering(entry.path()) {
             Ok(r) => {
                 tx.send(ScanItem::MasterRecordingFile(

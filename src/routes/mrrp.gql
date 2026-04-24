@@ -17,6 +17,29 @@ query GetFlacTracks($cursor: String, $order: OrderByEnum = ASC) {
             durationSecs
             recordingId
             id
+
+            trackMedia (filters:  {
+                usage:  {
+                   eq: "FrontCover"
+                }
+
+            } orderBy: {
+               visualIndex: ASC
+            }
+            pagination:  {
+                page:  {
+                    limit: 1
+                    page: 0
+                }
+            }) {
+              nodes {
+                id
+                usage
+                mediaType
+                colorMode
+                visualIndex
+              }
+            }
         }
         pageInfo {
             hasNextPage
