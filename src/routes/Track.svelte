@@ -64,14 +64,12 @@
 
 <style>
     .track {
-        display: inline-block;
+        display: flex;
+        flex-direction: column;
         container-type: inline-size;
-        /*max-width: 8em;*/
-        flex: 0 0 auto;
-        width: 8em;
     }
     .cover {
         max-width: 100%;
-        display: inline-block;
+        display: block;
     }
 </style>

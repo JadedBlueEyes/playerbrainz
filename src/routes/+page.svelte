@@ -50,8 +50,8 @@
 > Next </button>
 <style>
     .tracks {
-        display: flex;
-        flex-flow: column wrap;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(8em, 1fr));
+        gap: 1rem;
     }
 </style>
