@@ -10,6 +10,8 @@ pub struct Model {
     /// crypt(3) formatted password hash as per `password-hash`
     pub password: String,
 
+    pub admin: bool,
+
     pub created_at: DateTimeWithTimeZone,
     pub updated_at: DateTimeWithTimeZone,
 }
