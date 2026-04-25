@@ -3,6 +3,7 @@ mod graph;
 use async_graphql::http::GraphiQLSource;
 use async_graphql_axum::GraphQL;
 use axum::{Router, response::IntoResponse, routing::get};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::graph::schema;
 
@@ -12,6 +13,11 @@ async fn graphiql() -> impl IntoResponse {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::EnvFilter::from_default_env())
+        .init();
+
     let schema = schema();
 
     let app = Router::new()
