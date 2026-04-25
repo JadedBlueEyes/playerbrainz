@@ -32,21 +32,21 @@ describe('Player', () => {
 
         player.addTrackToQueue(2);
         expect(player.queue).toEqual([1, 2]);
-        expect(player.queueIndex).toBe(0); 
+        expect(player.queueIndex).toBe(0);
         expect(player.currentTrackId).toBe(1);
     });
 
     it('should go to next track', () => {
         player.playTrack(1);
         player.addTrackToQueue(2);
-        
+
         player.nextTrack();
         expect(player.queueIndex).toBe(1);
         expect(player.currentTrackId).toBe(2);
         expect(player.currentTime).toBe(0);
 
         player.nextTrack(); // At end of queue
-        expect(player.queueIndex).toBe(1); 
+        expect(player.queueIndex).toBe(1);
         expect(player.currentTrackId).toBe(2);
     });
 
