@@ -18,6 +18,7 @@ repos:
         - id: check-json
         - id: check-toml
         - id: end-of-file-fixer
+          exclude: 'schema.graphql'
         - id: trailing-whitespace
         - id: mixed-line-ending
         - id: check-merge-conflict
