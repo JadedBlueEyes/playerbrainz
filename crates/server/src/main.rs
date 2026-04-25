@@ -1,11 +1,13 @@
 mod graph;
 
-use async_graphql::http::GraphiQLSource;
+use async_graphql::{EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_axum::GraphQL;
 use axum::{Router, response::IntoResponse, routing::get};
+use playerbrainz_entities::{User, user};
+use sea_orm::{Database, EntityTrait, IntoActiveModel, SqlErr};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use crate::graph::schema;
+use crate::graph::Query;
 
 async fn graphiql() -> impl IntoResponse {
     axum::response::Html(GraphiQLSource::build().endpoint("/graphql").finish())
@@ -18,7 +20,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    let schema = schema();
+    let database_url =
+        std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://music.db?mode=rwc".to_string());
+
+    let db = Database::connect(database_url).await?;
+    // synchronizes database schema with entity definitions
+    db.get_schema_registry("playerbrainz_entities::*")
+        .sync(&db)
+        .await?;
+
+    let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
+        .data(db.clone())
+        .finish();
+    let db = &db;
+
+    if let Err(e) = User::insert(user::NewUser {
+        id: 0, password: "$argon2i$v=19$m=65536,t=1,p=1$c29tZXNhbHQAAAAAAAAAAA$+r0d29hqEB0yasKr55ZgICsQGSkl0v0kgwhd+U3wyRo".to_string(), admin: true }.into_active_model()).exec(db).await && e.sql_err().filter(|e| matches!(e, SqlErr::UniqueConstraintViolation(_))).is_none() {
+            Err(e)?;
+        }
 
     let app = Router::new()
         .route("/", get(serve_index))

@@ -9,7 +9,3 @@ impl Query {
         "Hello :3".to_string()
     }
 }
-
-pub fn schema() -> Schema<Query, EmptyMutation, EmptySubscription> {
-    Schema::build(Query, EmptyMutation, EmptySubscription).finish()
-}

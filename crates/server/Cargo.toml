@@ -26,3 +26,5 @@ serde_json = "1.0.149"
 dotenv = "0.15.0"
 
 symphonia = "0.6.0-alpha.2"
+
+playerbrainz-entities = { path = "../entities",  }

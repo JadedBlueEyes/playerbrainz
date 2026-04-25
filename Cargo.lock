@@ -2230,6 +2230,7 @@ dependencies = [
  "async-graphql-axum",
  "axum",
  "dotenv",
+ "playerbrainz-entities",
  "sea-orm",
  "serde",
  "serde_json",

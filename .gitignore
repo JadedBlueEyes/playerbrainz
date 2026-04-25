@@ -26,3 +26,5 @@ vite.config.ts.timestamp-*
 test-results
 
 .houdini
+
+music.db*
