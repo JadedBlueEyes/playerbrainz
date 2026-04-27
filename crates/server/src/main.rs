@@ -34,8 +34,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .finish();
     let db = &db;
 
-    if let Err(e) = User::insert(user::NewUser {
-        id: 0, password: "$argon2i$v=19$m=65536,t=1,p=1$c29tZXNhbHQAAAAAAAAAAA$+r0d29hqEB0yasKr55ZgICsQGSkl0v0kgwhd+U3wyRo".to_string(), admin: true }.into_active_model()).exec(db).await && e.sql_err().filter(|e| matches!(e, SqlErr::UniqueConstraintViolation(_))).is_none() {
+    if let Err(e) = User::insert(user::ActiveModel {
+        admin: sea_orm::ActiveValue::Set(true),
+        ..user::NewUser {
+            id: 0,
+            slug: "admin",
+            password: "$argon2i$v=19$m=65536,t=1,p=1$c29tZXNhbHQAAAAAAAAAAA$+r0d29hqEB0yasKr55ZgICsQGSkl0v0kgwhd+U3wyRo".to_string(),
+        }.into_active_model()
+    }).exec(db).await && e.sql_err().filter(|e| matches!(e, SqlErr::UniqueConstraintViolation(_))).is_none() {
             Err(e)?;
         }
 

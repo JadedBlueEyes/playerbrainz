@@ -8,6 +8,8 @@ pub struct Model {
     pub id: i32,
     #[sea_orm(nullable)]
     pub display_name: Option<String>,
+    #[sea_orm(unique, indexed)]
+    pub slug: String,
     /// crypt(3) formatted password hash as per `password-hash`
     pub password: String,
 
@@ -27,6 +29,6 @@ impl ActiveModelBehavior for ActiveModel {}
 )]
 pub struct NewUser {
     pub id: i32,
+    pub slug: String,
     pub password: String,
-    pub admin: bool,
 }
