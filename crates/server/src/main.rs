@@ -1,13 +1,21 @@
+mod error;
 mod graph;
+mod login;
 
 use async_graphql::{EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
 use async_graphql_axum::GraphQL;
-use axum::{Router, response::IntoResponse, routing::get};
-use playerbrainz_entities::{User, user};
+use axum::{
+    Router,
+    response::IntoResponse,
+    routing::{get, post},
+};
 use sea_orm::{Database, EntityTrait, IntoActiveModel, SqlErr};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+use playerbrainz_entities::{User, user};
+
 use crate::graph::Query;
+use crate::login::login;
 
 async fn graphiql() -> impl IntoResponse {
     axum::response::Html(GraphiQLSource::build().endpoint("/graphql").finish())
@@ -38,7 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         admin: sea_orm::ActiveValue::Set(true),
         ..user::NewUser {
             id: 0,
-            slug: "admin",
+            slug: "admin".to_string(),
             password: "$argon2i$v=19$m=65536,t=1,p=1$c29tZXNhbHQAAAAAAAAAAA$+r0d29hqEB0yasKr55ZgICsQGSkl0v0kgwhd+U3wyRo".to_string(),
         }.into_active_model()
     }).exec(db).await && e.sql_err().filter(|e| matches!(e, SqlErr::UniqueConstraintViolation(_))).is_none() {
@@ -47,7 +55,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", get(serve_index))
-        .route("/graphql", get(graphiql).post_service(GraphQL::new(schema)));
+        .route("/graphql", get(graphiql).post_service(GraphQL::new(schema)))
+        .route("/login", post(login))
+        .with_state(db.clone());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3030").await?;
     axum::serve(listener, app).await?;
