@@ -10,7 +10,7 @@ use axum::{
     response::IntoResponse,
     routing::{get, post},
 };
-use sea_orm::{Database, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter, SqlErr};
+use sea_orm::{Database, DatabaseConnection, EntityTrait, IntoActiveModel, SqlErr};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use playerbrainz_entities::{User, session, user};
