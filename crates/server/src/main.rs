@@ -3,22 +3,46 @@ mod graph;
 mod login;
 
 use async_graphql::{EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
-use async_graphql_axum::GraphQL;
 use axum::{
-    Router,
+    Json, Router,
+    extract::{Extension, State},
+    http::HeaderMap,
     response::IntoResponse,
     routing::{get, post},
 };
-use sea_orm::{Database, EntityTrait, IntoActiveModel, SqlErr};
+use sea_orm::{
+    ColumnTrait, Database, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter, SqlErr,
+};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use playerbrainz_entities::{User, user};
+use playerbrainz_entities::{User, session, user};
 
 use crate::graph::Query;
 use crate::login::login;
 
 async fn graphiql() -> impl IntoResponse {
     axum::response::Html(GraphiQLSource::build().endpoint("/graphql").finish())
+}
+
+async fn graphql_handler(
+    State(db): State<DatabaseConnection>,
+    Extension(schema): Extension<Schema<Query, EmptyMutation, EmptySubscription>>,
+    headers: HeaderMap,
+    req: async_graphql_axum::GraphQLRequest,
+) -> async_graphql_axum::GraphQLResponse {
+    let mut req = req.into_inner();
+
+    if let Some(auth_header) = headers.get(axum::http::header::AUTHORIZATION) {
+        if let Ok(auth_str) = auth_header.to_str() {
+            if let Some(token) = auth_str.strip_prefix("Bearer ") {
+                if let Ok(Some(session)) = session::Entity::find_by_id(token).one(&db).await {
+                    req = req.data(session);
+                }
+            }
+        }
+    }
+
+    schema.execute(req).await.into()
 }
 
 #[tokio::main]
@@ -55,8 +79,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let app = Router::new()
         .route("/", get(serve_index))
-        .route("/graphql", get(graphiql).post_service(GraphQL::new(schema)))
+        .route("/graphql", get(graphiql).post(graphql_handler))
         .route("/login", post(login))
+        .layer(Extension(schema))
         .with_state(db.clone());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3030").await?;
