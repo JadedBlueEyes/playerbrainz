@@ -4,15 +4,13 @@ mod login;
 
 use async_graphql::{EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
 use axum::{
-    Json, Router,
+    Router,
     extract::{Extension, State},
     http::HeaderMap,
     response::IntoResponse,
     routing::{get, post},
 };
-use sea_orm::{
-    ColumnTrait, Database, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter, SqlErr,
-};
+use sea_orm::{Database, DatabaseConnection, EntityTrait, IntoActiveModel, QueryFilter, SqlErr};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use playerbrainz_entities::{User, session, user};
@@ -32,14 +30,12 @@ async fn graphql_handler(
 ) -> async_graphql_axum::GraphQLResponse {
     let mut req = req.into_inner();
 
-    if let Some(auth_header) = headers.get(axum::http::header::AUTHORIZATION) {
-        if let Ok(auth_str) = auth_header.to_str() {
-            if let Some(token) = auth_str.strip_prefix("Bearer ") {
-                if let Ok(Some(session)) = session::Entity::find_by_id(token).one(&db).await {
-                    req = req.data(session);
-                }
-            }
-        }
+    if let Some(auth_header) = headers.get(axum::http::header::AUTHORIZATION)
+        && let Ok(auth_str) = auth_header.to_str()
+        && let Some(token) = auth_str.strip_prefix("Bearer ")
+        && let Ok(Some(session)) = session::Entity::find_by_id(token).one(&db).await
+    {
+        req = req.data(session);
     }
 
     schema.execute(req).await.into()

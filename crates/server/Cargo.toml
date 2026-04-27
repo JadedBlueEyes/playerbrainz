@@ -10,7 +10,7 @@ anyhow = "1.0.102"
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
-async-graphql = "7.2.1"
+async-graphql = { version = "7.2.1", features = ["chrono"] }
 async-graphql-axum = "7.2.1"
 
 axum = { version = "0.8", features = ["macros"] }
