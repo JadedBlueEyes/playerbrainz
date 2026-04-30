@@ -2,8 +2,13 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { setContext, onMount } from 'svelte';
 	import { Player } from '$lib/player.svelte';
+	import { setClientSession } from '$houdini';
 
-	let { children } = $props();
+	let { data, children } = $props();
+
+	$effect(() => {
+		setClientSession({ token: data.token });
+	});
 
 	let player = new Player();
 
@@ -33,3 +38,11 @@
 </svelte:head>
 
 {@render children()}
+
+<style>
+    :global(:root) {
+        font-family: sans-serif;
+        --primary-color: #024dcb; /* One of the colours from my logo :3 */
+        --error-color: red;
+    }
+</style>

@@ -78,6 +78,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/graphql", get(graphiql).post(graphql_handler))
         .route("/login", post(login))
         .layer(Extension(schema))
+        .layer(
+            tower_http::cors::CorsLayer::new()
+                .allow_origin(tower_http::cors::Any)
+                .allow_methods(tower_http::cors::Any)
+                .allow_headers(tower_http::cors::Any),
+        )
         .with_state(db.clone());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3030").await?;
