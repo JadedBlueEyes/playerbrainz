@@ -3,7 +3,6 @@ use std::{
     sync::atomic::AtomicBool, time::Duration,
 };
 
-use notify_debouncer_full::new_debouncer;
 use tokio::sync::mpsc;
 use tracing::{error, info};
 use walkdir::{DirEntry, WalkDir};
@@ -16,32 +15,30 @@ pub const SCANNER_VERSION: &str = "0";
 mod read;
 mod structs;
 
-pub fn watch_directory(
-    dir: impl AsRef<Path>,
+pub fn watch(
     tx: mpsc::UnboundedSender<ScanItem>,
     stopping: AtomicBool,
+    watcher_rx: std::sync::mpsc::Receiver<
+        Result<
+            Vec<notify_debouncer_full::DebouncedEvent>,
+            Vec<notify_debouncer_full::notify::Error>,
+        >,
+    >,
 ) {
-    let dir = dir.as_ref();
-
-    let (watcher_tx, watcher_rx) = std::sync::mpsc::channel();
-    let mut watcher = new_debouncer(Duration::from_secs(5), None, watcher_tx).unwrap();
-    watcher
-        .watch(dir, notify_debouncer_full::notify::RecursiveMode::Recursive)
-        .unwrap();
-
-    read_directory(dir, &tx);
-
     loop {
         match watcher_rx.recv_timeout(Duration::from_secs(15)) {
             Ok(Ok(batch)) => {
                 let mut scan_roots: HashSet<&Path> = HashSet::new();
 
                 for evt in &batch {
-                    for p in &evt.paths {
-                        if p.is_file() && p.file_name().is_some_and(|p| !is_ignored_file(p)) {
-                            scan_roots.insert(p.parent().unwrap_or(dir));
+                    for path in &evt.paths {
+                        if path.is_file()
+                            && path.file_name().is_some_and(|p| !is_ignored_file(p))
+                            && let Some(parent) = path.parent()
+                        {
+                            scan_roots.insert(parent);
                         } else {
-                            scan_roots.insert(p);
+                            scan_roots.insert(path);
                         }
                     }
                 }
