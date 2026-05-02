@@ -1,8 +1,5 @@
-use std::ops::Deref;
-
 use crate::UuidVec;
 use sea_orm::entity::prelude::*;
-use serde::{Deserialize, Serialize};
 
 #[sea_orm::model]
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]

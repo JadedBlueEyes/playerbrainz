@@ -9,7 +9,7 @@ use uuid::Uuid;
 #[derive(Debug)]
 pub enum ScanItem {
     /// The contents of the directory have been sent, finish
-    DirComplete,
+    DirComplete(PathBuf),
     /// Lyric file
     LyricFile(PathBuf),
     /// Art file

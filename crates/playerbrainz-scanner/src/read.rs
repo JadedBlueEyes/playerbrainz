@@ -202,7 +202,7 @@ pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata,
 
     if let Some(track) = probed.default_track(symphonia::core::formats::TrackType::Audio) {
         if let Some(codec) = &track.codec_params {
-            let audio_codec = codec.audio().expect("audio track");
+            let _audio_codec = codec.audio().expect("audio track");
             // Extract bitrate, sample frequency, bit depth
         }
         res.track_duration = track.duration;
