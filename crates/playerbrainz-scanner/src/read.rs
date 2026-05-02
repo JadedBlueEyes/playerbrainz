@@ -56,6 +56,7 @@ pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata,
     if let Ok(file_meta) = source.metadata() {
         res.modified = file_meta.modified().ok();
         res.created = file_meta.created().ok();
+        res.file_size = Some(file_meta.len());
     }
 
     let mss = MediaSourceStream::new(source, Default::default());
@@ -66,6 +67,8 @@ pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata,
 
     let mut probed =
         symphonia::default::get_probe().probe(&hint, mss, format_opts, metadata_opts)?;
+
+    res.format_short_name = Some(probed.format_info().short_name);
 
     let mut metadata = probed.metadata();
 
@@ -196,6 +199,15 @@ pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata,
     } else {
         // Concerning but legitimate AFAIK
     };
+
+    if let Some(track) = probed.default_track(symphonia::core::formats::TrackType::Audio) {
+        if let Some(codec) = &track.codec_params {
+            let audio_codec = codec.audio().expect("audio track");
+            // Extract bitrate, sample frequency, bit depth
+        }
+        res.track_duration = track.duration;
+        res.track_time_base = track.time_base;
+    }
 
     Ok(res)
 }

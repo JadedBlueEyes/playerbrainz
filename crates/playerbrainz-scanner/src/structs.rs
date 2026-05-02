@@ -1,6 +1,9 @@
 use std::{path::PathBuf, time::SystemTime};
 
-use symphonia::core::meta::{ColorMode, StandardVisualKey};
+use symphonia::core::{
+    meta::{ColorMode, StandardVisualKey},
+    units::{Duration, TimeBase},
+};
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -42,9 +45,12 @@ pub struct MasterRecordingMetadata {
     // Filesystem data
     pub created: Option<SystemTime>,
     pub modified: Option<SystemTime>,
+    pub file_size: Option<u64>, // in bytes
 
-    /// Duration in seconds
-    pub duration_secs: Option<f64>,
+    pub track_duration: Option<Duration>,
+    pub track_time_base: Option<TimeBase>,
+    // Audio format
+    pub format_short_name: Option<&'static str>,
 
     // ReplayGain data
     pub track_gain_db: Option<f32>,
