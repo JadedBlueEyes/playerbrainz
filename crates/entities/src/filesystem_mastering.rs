@@ -41,8 +41,9 @@ pub struct Model {
     pub modified: Option<DateTimeUtc>,
     pub file_size: Option<u64>, // in bytes
 
-    pub track_duration: Option<Duration>,
-    pub track_time_base: Option<TimeBase>,
+    pub track_duration: Option<u64>,
+    pub track_time_base_numerator: Option<u32>,
+    pub track_time_base_denominator: Option<u32>,
     // Audio format
     pub format_short_name: Option<String>,
 
