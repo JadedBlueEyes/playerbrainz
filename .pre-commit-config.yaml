@@ -44,7 +44,15 @@ repos:
         entry: cargo fmt --
         language: system
         types: [rust]
-        pass_filenames: false
+        pass_filenames: true
+        stages:
+            - pre-commit
+      - id: pretttier
+        name: pretttier
+        entry: pnpm run format-files
+        language: system
+        types: [svelte, javascript, ts, css, graphql]
+        pass_filenames: true
         stages:
             - pre-commit
 
