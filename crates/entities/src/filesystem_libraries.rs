@@ -24,6 +24,17 @@ impl ActiveModelBehavior for ActiveModel {}
     set(created_at = "chrono::Utc::now().fixed_offset()")
 )]
 pub struct NewFsLibrary {
-    pub id: i32,
     pub path: String,
+    pub display_name: Option<String>,
+}
+
+#[derive(DeriveIntoActiveModel)]
+#[sea_orm(
+    active_model = "ActiveModel",
+    set(updated_at = "chrono::Utc::now().fixed_offset()")
+)]
+pub struct UpdateFsLibrary {
+    pub id: i32,
+    pub path: Option<String>,
+    pub display_name: Option<Option<String>>,
 }

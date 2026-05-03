@@ -2,20 +2,24 @@ mod error;
 mod graph;
 mod login;
 
-use async_graphql::{EmptyMutation, EmptySubscription, Schema, http::GraphiQLSource};
+use async_graphql::{EmptySubscription, Schema, dataloader::DataLoader, http::GraphiQLSource};
 use axum::{
     Router,
     extract::{Extension, State},
-    http::HeaderMap,
     response::IntoResponse,
     routing::{get, post},
+};
+use axum_extra::{
+    TypedHeader,
+    headers::{Authorization, authorization::Bearer},
+    typed_header::TypedHeaderRejection,
 };
 use sea_orm::{Database, DatabaseConnection, EntityTrait, IntoActiveModel, SqlErr};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use playerbrainz_entities::{User, session, user};
 
-use crate::graph::Query;
+use crate::graph::{Query, fs_libraries::FsLibraryMutation};
 use crate::login::login;
 
 async fn graphiql() -> impl IntoResponse {
@@ -24,18 +28,20 @@ async fn graphiql() -> impl IntoResponse {
 
 async fn graphql_handler(
     State(db): State<DatabaseConnection>,
-    Extension(schema): Extension<Schema<Query, EmptyMutation, EmptySubscription>>,
-    headers: HeaderMap,
+    Extension(schema): Extension<Schema<Query, FsLibraryMutation, EmptySubscription>>,
+    auth: Result<TypedHeader<Authorization<Bearer>>, TypedHeaderRejection>,
+    // jar: CookieJar,
     req: async_graphql_axum::GraphQLRequest,
 ) -> async_graphql_axum::GraphQLResponse {
+    let token = auth.as_ref().ok().map(|h| h.token());
+    // .or_else(|| jar.get("pb_token").map(|c| c.value()));
     let mut req = req.into_inner();
 
-    if let Some(auth_header) = headers.get(axum::http::header::AUTHORIZATION)
-        && let Ok(auth_str) = auth_header.to_str()
-        && let Some(token) = auth_str.strip_prefix("Bearer ")
+    if let Some(token) = token
         && let Ok(Some(session)) = session::Entity::find_by_id(token).one(&db).await
+        && let Ok(Some(user)) = user::Entity::find_by_id(session.user_id).one(&db).await
     {
-        req = req.data(session);
+        req = req.data(session).data(user);
     }
 
     schema.execute(req).await.into()
@@ -57,8 +63,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .sync(&db)
         .await?;
 
-    let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
+    let schema = Schema::build(Query::default(), FsLibraryMutation, EmptySubscription)
         .data(db.clone())
+        .data(DataLoader::new(
+            crate::graph::fs_libraries::FsLibraryByIdLoader { db: db.clone() },
+            tokio::spawn,
+        ))
         .finish();
     let db = &db;
 
@@ -80,9 +90,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .layer(Extension(schema))
         .layer(
             tower_http::cors::CorsLayer::new()
-                .allow_origin(tower_http::cors::Any)
-                .allow_methods(tower_http::cors::Any)
-                .allow_headers(tower_http::cors::Any),
+                .allow_origin(tower_http::cors::AllowOrigin::mirror_request())
+                .allow_methods([
+                    axum::http::Method::GET,
+                    axum::http::Method::POST,
+                    axum::http::Method::OPTIONS,
+                ])
+                .allow_headers([
+                    axum::http::header::CONTENT_TYPE,
+                    axum::http::header::AUTHORIZATION,
+                    axum::http::header::ACCEPT,
+                ])
+                .allow_credentials(true),
         )
         .with_state(db.clone());
 

@@ -1,21 +1,15 @@
-use async_graphql::*;
+use async_graphql::{Context, Object, Result};
+
 use playerbrainz_entities::{session, user};
 use sea_orm::{DatabaseConnection, EntityTrait};
 
-pub struct Query;
+use super::User;
 
-#[derive(SimpleObject)]
-pub struct User {
-    pub id: i32,
-    pub display_name: Option<String>,
-    pub slug: String,
-    pub admin: bool,
-    pub created_at: chrono::DateTime<chrono::FixedOffset>,
-    pub updated_at: chrono::DateTime<chrono::FixedOffset>,
-}
+#[derive(Default)]
+pub struct UtilQuery;
 
 #[Object]
-impl Query {
+impl UtilQuery {
     async fn hello<'ctx>(&self, ctx: &Context<'ctx>) -> String {
         ctx.append_http_header("Meow", "mrrp mrrp");
         "Hello :3".to_string()
@@ -27,7 +21,7 @@ impl Query {
             let user_model = user::Entity::find_by_id(session.user_id)
                 .one(db)
                 .await?
-                .ok_or_else(|| Error::new("User not found"))?;
+                .ok_or_else(|| async_graphql::Error::new("User not found"))?;
 
             Ok(User {
                 id: user_model.id,
