@@ -2490,6 +2490,7 @@ dependencies = [
  "dotenv",
  "password-auth",
  "playerbrainz-entities",
+ "playerbrainz-scanner",
  "rand 0.10.1",
  "sea-orm",
  "serde",

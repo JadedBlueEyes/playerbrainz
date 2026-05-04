@@ -10,6 +10,9 @@ use walkdir::{DirEntry, WalkDir};
 use crate::read::{ScanError, try_read_mastering};
 pub use crate::structs::ScanItem;
 
+pub use notify_debouncer_full as notify;
+pub use notify_debouncer_full::notify::RecursiveMode;
+
 pub const SCANNER_VERSION: &str = "0";
 
 mod read;
@@ -17,7 +20,7 @@ mod structs;
 
 pub fn watch(
     tx: mpsc::UnboundedSender<ScanItem>,
-    stopping: AtomicBool,
+    stopping: &AtomicBool,
     watcher_rx: std::sync::mpsc::Receiver<
         Result<
             Vec<notify_debouncer_full::DebouncedEvent>,

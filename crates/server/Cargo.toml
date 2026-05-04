@@ -28,6 +28,7 @@ dotenv = "0.15.0"
 symphonia = "0.6.0-alpha.2"
 
 playerbrainz-entities = { path = "../entities",  }
+playerbrainz-scanner = { path = "../playerbrainz-scanner",  }
 
 password-auth = "1.0.0"
 chrono = { version = "0.4.44", features = ["serde"] }

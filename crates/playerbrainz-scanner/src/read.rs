@@ -109,12 +109,16 @@ pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata,
                         res.release_group_ids.push(id)
                     }
                 } // As expected
-                // StandardTag::MusicBrainzRecordingId(_) => todo!(), // Haven't seen this set
+                StandardTag::MusicBrainzRecordingId(id) => {
+                    res.recording_id = Uuid::parse_str(id)
+                        .inspect_err(|e| warn!(%e, %id, "Parse error"))
+                        .ok()
+                } // Haven't seen this set
                 StandardTag::MusicBrainzTrackId(id) => {
                     res.recording_id = Uuid::parse_str(id)
                         .inspect_err(|e| warn!(%e, %id, "Parse error"))
                         .ok()
-                } // Actually the recording ID per picard? Symphonia bug?
+                } // Actually the recording ID per picard? Symphonia bug? (in flac files)
                 StandardTag::MusicBrainzReleaseTrackId(id) => {
                     if let Ok(id) =
                         Uuid::parse_str(id).inspect_err(|e| warn!(%e, %id, "Parse error"))

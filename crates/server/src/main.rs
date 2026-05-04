@@ -1,5 +1,6 @@
 mod error;
 mod graph;
+mod indexer;
 mod login;
 mod shutdown;
 
@@ -110,10 +111,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_state(db.clone());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3030").await?;
-    axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal())
-        .await?;
 
+    let indexer = indexer::indexer_task(db);
+    let server = axum::serve(listener, app).with_graceful_shutdown(shutdown_signal());
+
+    let (indexer_result, server_result) = tokio::join!(indexer, server);
+    if let Err(e) = indexer_result {
+        tracing::error!("Indexer task failed: {}", e);
+    }
+    if let Err(e) = server_result {
+        tracing::error!("Server task failed: {}", e);
+    }
     Ok(())
 }
 

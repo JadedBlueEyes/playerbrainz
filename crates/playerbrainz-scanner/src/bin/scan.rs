@@ -34,7 +34,7 @@ async fn main() {
                 .unwrap();
 
             read_directory(&cli.dir, &tx);
-            watch(tx, stopping, watcher_rx);
+            watch(tx, &stopping, watcher_rx);
         } else {
             read_directory(Path::new(&cli.dir), &tx)
         }
