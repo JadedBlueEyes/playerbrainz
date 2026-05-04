@@ -8,7 +8,8 @@ input CreateFilesystemLibraryInput {
 
 input CreateUserInput {
   admin: Boolean!
-  displayName: String!
+  displayName: String
+  password: String!
   slug: String!
 }
 
@@ -49,6 +50,7 @@ type Query {
   filesystemLibraryById(id: Int!): FilesystemLibrary
   filesystemLibraryByPath(path: String!): FilesystemLibrary
   hello: String!
+  user(id: Int!): User
   users: [User!]!
   whoami: User!
 }
