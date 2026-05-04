@@ -30,7 +30,6 @@ Similarly, album art is properly matched with a Release. However:
 
 For this reason, a more complicated lookup logic should be used, although this may depend more on the preference of the user.
 
-
 Scanner channel:
 
 The core scanner's output is a channel of ScanItems.

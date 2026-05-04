@@ -1,14 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { Player } from './player.svelte';
+import { describe, it, expect, beforeEach } from "vitest";
+import { Player } from "./player.svelte";
 
-describe('Player', () => {
+describe("Player", () => {
     let player: Player;
 
     beforeEach(() => {
         player = new Player();
     });
 
-    it('should initialize with default state', () => {
+    it("should initialize with default state", () => {
         expect(player.queue).toEqual([]);
         expect(player.queueIndex).toBeUndefined();
         expect(player.currentTrackId).toBeUndefined();
@@ -16,7 +16,7 @@ describe('Player', () => {
         expect(player.paused).toBe(true);
     });
 
-    it('should play a track immediately', () => {
+    it("should play a track immediately", () => {
         player.playTrack(123);
         expect(player.queue).toEqual([123]);
         expect(player.queueIndex).toBe(0);
@@ -24,7 +24,7 @@ describe('Player', () => {
         expect(player.currentTime).toBe(0);
     });
 
-    it('should add track to queue', () => {
+    it("should add track to queue", () => {
         player.addTrackToQueue(1);
         expect(player.queue).toEqual([1]);
         expect(player.queueIndex).toBe(0);
@@ -36,7 +36,7 @@ describe('Player', () => {
         expect(player.currentTrackId).toBe(1);
     });
 
-    it('should go to next track', () => {
+    it("should go to next track", () => {
         player.playTrack(1);
         player.addTrackToQueue(2);
 
@@ -50,13 +50,13 @@ describe('Player', () => {
         expect(player.currentTrackId).toBe(2);
     });
 
-    it('should load state from an object', () => {
+    it("should load state from an object", () => {
         player.load({
             queue: [10, 20],
             queueIndex: 1,
             currentTrackId: 20,
             currentTime: 45.5,
-            paused: false
+            paused: false,
         });
 
         expect(player.queue).toEqual([10, 20]);
@@ -66,7 +66,7 @@ describe('Player', () => {
         expect(player.paused).toBe(false);
     });
 
-    it('should serialize to JSON correctly', () => {
+    it("should serialize to JSON correctly", () => {
         player.playTrack(5);
         player.addTrackToQueue(10);
         player.currentTime = 30;
@@ -81,6 +81,4 @@ describe('Player', () => {
         expect(parsed.currentTime).toBe(30);
         expect(parsed.paused).toBe(false);
     });
-
-
 });

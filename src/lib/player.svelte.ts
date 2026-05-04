@@ -22,7 +22,10 @@ export class Player {
     }
 
     nextTrack() {
-        if (this.queueIndex !== undefined && this.queueIndex < this.queue.length - 1) {
+        if (
+            this.queueIndex !== undefined &&
+            this.queueIndex < this.queue.length - 1
+        ) {
             this.queueIndex++;
             this.currentTrackId = this.queue[this.queueIndex];
             this.currentTime = 0;
@@ -33,8 +36,10 @@ export class Player {
         if (!state) return;
         if (state.queue) this.queue = state.queue;
         if (state.queueIndex !== undefined) this.queueIndex = state.queueIndex;
-        if (state.currentTrackId !== undefined) this.currentTrackId = state.currentTrackId;
-        if (state.currentTime !== undefined) this.currentTime = state.currentTime;
+        if (state.currentTrackId !== undefined)
+            this.currentTrackId = state.currentTrackId;
+        if (state.currentTime !== undefined)
+            this.currentTime = state.currentTime;
         if (state.paused !== undefined) this.paused = state.paused;
     }
 
@@ -44,7 +49,7 @@ export class Player {
             queueIndex: this.queueIndex,
             currentTrackId: this.currentTrackId,
             currentTime: this.currentTime,
-            paused: this.paused
+            paused: this.paused,
         };
     }
 }

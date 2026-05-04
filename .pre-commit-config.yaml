@@ -49,9 +49,9 @@ repos:
                 - pre-commit
           - id: pretttier
             name: pretttier
-            entry: pnpm run format-files
+            entry: pnpm run format-files --
             language: system
-            types: [svelte, javascript, ts, css, graphql]
+            types: [text]
             pass_filenames: true
             stages:
                 - pre-commit

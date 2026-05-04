@@ -2,15 +2,15 @@
 
 /** @type {import('houdini').ConfigFile} */
 const config = {
-    "watchSchema": {
-        "url": "http://localhost:3030/graphql"
+    watchSchema: {
+        url: "http://localhost:3030/graphql",
     },
-    "runtimeDir": ".houdini",
-    "plugins": {
+    runtimeDir: ".houdini",
+    plugins: {
         "houdini-svelte": {
-            forceRunesMode: true
-        }
-    }
-}
+            forceRunesMode: true,
+        },
+    },
+};
 
-export default config
+export default config;
