@@ -75,6 +75,27 @@ pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata,
     if let Some(metadata) = metadata.skip_to_latest() {
         for tag in &metadata.media.tags {
             let Some(std) = tag.std.as_ref() else {
+                if tag.raw.key == "UFID" {
+                    if let Some(sub_fields) = &tag.raw.sub_fields {
+                        if sub_fields.iter().any(|f| {
+                            f.field == "OWNER"
+                                && format!("{:?}", f.value) == "String(\"http://musicbrainz.org\")"
+                        }) {
+                            let value_str = format!("{:?}", tag.raw.value);
+                            let bytes: Vec<u8> = value_str
+                                .replace("Binary([", "")
+                                .replace("])", "")
+                                .split(", ")
+                                .map(|s| s.parse().unwrap())
+                                .collect();
+                            if let Ok(s) = String::from_utf8(bytes) {
+                                if let Ok(id) = Uuid::parse_str(&s) {
+                                    res.recording_id = Some(id);
+                                }
+                            }
+                        }
+                    }
+                }
                 continue;
             };
 

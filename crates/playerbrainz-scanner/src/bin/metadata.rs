@@ -53,6 +53,22 @@ fn main() {
         metadata.media.tags.iter().for_each(|tag| {
             if let Some(std) = tag.std.as_ref() {
                 println!("{std:?}")
+            } else if tag.raw.key == "UFID" {
+                if let Some(sub_fields) = &tag.raw.sub_fields {
+                    if sub_fields.iter().any(|f| f.field == "OWNER") {
+                        let value_str = format!("{:?}", tag.raw.value);
+                        let bytes: Vec<u8> = value_str
+                            .replace("Binary([", "")
+                            .replace("])", "")
+                            .split(", ")
+                            .map(|s| s.parse().unwrap())
+                            .collect();
+                        println!(
+                            "MusicBrainzRecordingId: {}",
+                            String::from_utf8_lossy(&bytes)
+                        );
+                    }
+                }
             } else {
                 println!(
                     "{}: {}, {:?}",
