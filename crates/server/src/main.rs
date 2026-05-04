@@ -23,7 +23,7 @@ use playerbrainz_entities::{User, session, user};
 
 use crate::login::login;
 use crate::{
-    graph::{Query, fs_libraries::FsLibraryMutation},
+    graph::{Mutation, Query},
     shutdown::shutdown_signal,
 };
 
@@ -33,7 +33,7 @@ async fn graphiql() -> impl IntoResponse {
 
 async fn graphql_handler(
     State(db): State<DatabaseConnection>,
-    Extension(schema): Extension<Schema<Query, FsLibraryMutation, EmptySubscription>>,
+    Extension(schema): Extension<Schema<Query, Mutation, EmptySubscription>>,
     auth: Result<TypedHeader<Authorization<Bearer>>, TypedHeaderRejection>,
     // jar: CookieJar,
     req: async_graphql_axum::GraphQLRequest,
@@ -68,7 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .sync(&db)
         .await?;
 
-    let schema = Schema::build(Query::default(), FsLibraryMutation, EmptySubscription)
+    let schema = Schema::build(Query::default(), Mutation::default(), EmptySubscription)
         .data(db.clone())
         .data(DataLoader::new(
             crate::graph::fs_libraries::FsLibraryByIdLoader { db: db.clone() },

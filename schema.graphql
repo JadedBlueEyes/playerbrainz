@@ -1,14 +1,15 @@
-schema {
-  query: Query
-  mutation: FsLibraryMutation
-}
-
 input CreateFilesystemLibraryInput {
   """Optional human-friendly name."""
   displayName: String
 
   """Filesystem path for the library. Must be unique."""
   path: String!
+}
+
+input CreateUserInput {
+  admin: Boolean!
+  displayName: String!
+  slug: String!
 }
 
 """
@@ -22,6 +23,10 @@ input DeleteFilesystemLibraryInput {
   id: Int!
 }
 
+input DeleteUserInput {
+  id: Int!
+}
+
 type FilesystemLibrary {
   createdAt: DateTime!
   displayName: String
@@ -30,10 +35,13 @@ type FilesystemLibrary {
   updatedAt: DateTime!
 }
 
-type FsLibraryMutation {
+type Mutation {
   createFilesystemLibrary(input: CreateFilesystemLibraryInput!): FilesystemLibrary!
+  createUser(input: CreateUserInput!): User!
   deleteFilesystemLibrary(input: DeleteFilesystemLibraryInput!): Boolean!
+  deleteUser(input: DeleteUserInput!): Boolean!
   updateFilesystemLibrary(input: UpdateFilesystemLibraryInput!): FilesystemLibrary!
+  updateUser(input: UpdateUserInput!): User!
 }
 
 type Query {
@@ -41,6 +49,7 @@ type Query {
   filesystemLibraryById(id: Int!): FilesystemLibrary
   filesystemLibraryByPath(path: String!): FilesystemLibrary
   hello: String!
+  users: [User!]!
   whoami: User!
 }
 
@@ -48,6 +57,13 @@ input UpdateFilesystemLibraryInput {
   displayName: String
   id: Int!
   path: String
+}
+
+input UpdateUserInput {
+  admin: Boolean
+  displayName: String
+  id: Int!
+  slug: String
 }
 
 type User {

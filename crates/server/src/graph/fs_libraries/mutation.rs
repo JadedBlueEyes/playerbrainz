@@ -31,6 +31,7 @@ pub struct DeleteFilesystemLibraryInput {
 ///
 /// Auth:
 /// - admin only
+#[derive(Default)]
 pub struct FsLibraryMutation;
 
 #[Object]

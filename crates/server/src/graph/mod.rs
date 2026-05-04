@@ -1,17 +1,19 @@
 pub mod auth;
 pub mod fs_libraries;
 pub mod query;
-pub mod user;
+pub mod users;
 
 pub use query::UtilQuery;
-pub use user::User;
 
 use async_graphql::MergedObject;
 
-use crate::graph::fs_libraries::FsLibraryQuery;
+use crate::graph::{
+    fs_libraries::{FsLibraryMutation, FsLibraryQuery},
+    users::{mutation::UserManagementMutation, query::UserManagementQuery},
+};
 
 #[derive(MergedObject, Default)]
-pub struct Query(pub FsLibraryQuery, pub UtilQuery);
+pub struct Query(pub FsLibraryQuery, pub UtilQuery, pub UserManagementQuery);
 
-// #[derive(MergedObject, Default)]
-// pub struct Mutation(FsLibraryMutation);
+#[derive(MergedObject, Default)]
+pub struct Mutation(pub FsLibraryMutation, pub UserManagementMutation);
