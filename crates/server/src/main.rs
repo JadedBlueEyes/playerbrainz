@@ -1,6 +1,7 @@
 mod error;
 mod graph;
 mod login;
+mod shutdown;
 
 use async_graphql::{EmptySubscription, Schema, dataloader::DataLoader, http::GraphiQLSource};
 use axum::{
@@ -19,8 +20,11 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use playerbrainz_entities::{User, session, user};
 
-use crate::graph::{Query, fs_libraries::FsLibraryMutation};
 use crate::login::login;
+use crate::{
+    graph::{Query, fs_libraries::FsLibraryMutation},
+    shutdown::shutdown_signal,
+};
 
 async fn graphiql() -> impl IntoResponse {
     axum::response::Html(GraphiQLSource::build().endpoint("/graphql").finish())
@@ -106,7 +110,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_state(db.clone());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3030").await?;
-    axum::serve(listener, app).await?;
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
 
     Ok(())
 }
