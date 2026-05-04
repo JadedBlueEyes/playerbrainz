@@ -2,7 +2,7 @@ use std::{fs::File, path::Path};
 use symphonia::core::{
     formats::{FormatOptions, probe::Hint},
     io::MediaSourceStream,
-    meta::{MetadataOptions, StandardTag},
+    meta::{MetadataOptions, RawValue, StandardTag, Tag},
 };
 use thiserror::Error;
 use tracing::warn;
@@ -37,6 +37,27 @@ impl From<symphonia::core::errors::Error> for ScanError {
             _ => todo!(),
         }
     }
+}
+
+/// This is a workaround for the recording ID being encoded weirdly in MP3s
+pub fn get_musicbrainz_recording_id_from_raw_tag(tag: &Tag) -> Option<Uuid> {
+    if tag.raw.key == "UFID"
+        && let Some(sub_fields) = &tag.raw.sub_fields
+        && sub_fields.iter().any(|f| {
+            if f.field == "OWNER"
+                && let RawValue::String(ref uri) = f.value
+                && uri.as_bytes() == b"http://musicbrainz.org"
+            {
+                return true;
+            }
+            false
+        })
+        && let RawValue::Binary(bytes) = &tag.raw.value
+        && let Ok(id) = Uuid::try_parse_ascii(bytes.iter().as_slice())
+    {
+        return Some(id);
+    }
+    None
 }
 
 pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata, ScanError> {
@@ -75,25 +96,8 @@ pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata,
     if let Some(metadata) = metadata.skip_to_latest() {
         for tag in &metadata.media.tags {
             let Some(std) = tag.std.as_ref() else {
-                if tag.raw.key == "UFID"
-                    && let Some(sub_fields) = &tag.raw.sub_fields
-                    && sub_fields.iter().any(|f| {
-                        f.field == "OWNER"
-                            && format!("{:?}", f.value) == "String(\"http://musicbrainz.org\")"
-                    })
-                {
-                    let value_str = format!("{:?}", tag.raw.value);
-                    let bytes: Vec<u8> = value_str
-                        .replace("Binary([", "")
-                        .replace("])", "")
-                        .split(", ")
-                        .map(|s| s.parse().unwrap())
-                        .collect();
-                    if let Ok(s) = String::from_utf8(bytes)
-                        && let Ok(id) = Uuid::parse_str(&s)
-                    {
-                        res.recording_id = Some(id);
-                    }
+                if let Some(id) = get_musicbrainz_recording_id_from_raw_tag(tag) {
+                    res.recording_id = Some(id);
                 }
                 continue;
             };

@@ -15,7 +15,7 @@ pub use notify_debouncer_full::notify::RecursiveMode;
 
 pub const SCANNER_VERSION: &str = "0";
 
-mod read;
+pub mod read;
 mod structs;
 
 pub fn watch(

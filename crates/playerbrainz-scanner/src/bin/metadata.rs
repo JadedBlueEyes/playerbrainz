@@ -1,4 +1,5 @@
 use clap::Parser;
+use playerbrainz_scanner::read::get_musicbrainz_recording_id_from_raw_tag;
 use std::{fs::File, path::Path};
 use symphonia::core::{
     formats::{FormatOptions, probe::Hint},
@@ -53,22 +54,8 @@ fn main() {
         metadata.media.tags.iter().for_each(|tag| {
             if let Some(std) = tag.std.as_ref() {
                 println!("{std:?}")
-            } else if tag.raw.key == "UFID" {
-                if let Some(sub_fields) = &tag.raw.sub_fields
-                    && sub_fields.iter().any(|f| f.field == "OWNER")
-                {
-                    let value_str = format!("{:?}", tag.raw.value);
-                    let bytes: Vec<u8> = value_str
-                        .replace("Binary([", "")
-                        .replace("])", "")
-                        .split(", ")
-                        .map(|s| s.parse().unwrap())
-                        .collect();
-                    println!(
-                        "MusicBrainzRecordingId: {}",
-                        String::from_utf8_lossy(&bytes)
-                    );
-                }
+            } else if let Some(id) = get_musicbrainz_recording_id_from_raw_tag(tag) {
+                println!("MusicBrainzRecordingId: {}", id);
             } else {
                 println!(
                     "{}: {}, {:?}",
