@@ -30,6 +30,23 @@ impl UserManagementQuery {
         Ok(users)
     }
 
+    #[graphql(guard = "SessionGuard")]
+    pub async fn user(&self, ctx: &Context<'_>, id: i32) -> Result<Option<User>> {
+        let db = ctx.data::<DatabaseConnection>()?;
+        let user = user::Entity::find_by_id(id)
+            .one(db)
+            .await?
+            .map(|user| User {
+                id: user.id,
+                display_name: user.display_name,
+                slug: user.slug,
+                admin: user.admin,
+                created_at: user.created_at,
+                updated_at: user.updated_at,
+            });
+        Ok(user)
+    }
+
     async fn whoami<'ctx>(&self, ctx: &Context<'ctx>) -> Result<User> {
         if let Ok(session) = ctx.data::<session::Model>() {
             let db = ctx.data::<DatabaseConnection>()?;
