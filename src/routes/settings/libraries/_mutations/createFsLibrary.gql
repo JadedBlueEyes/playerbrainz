@@ -1,0 +1,11 @@
+mutation CreateFilesystemLibraryMutation(
+    $input: CreateFilesystemLibraryInput!
+) {
+    createFilesystemLibrary(input: $input) {
+        id
+        path
+        displayName
+        createdAt
+        updatedAt
+    }
+}

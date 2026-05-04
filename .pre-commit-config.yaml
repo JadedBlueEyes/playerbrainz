@@ -1,68 +1,68 @@
 default_install_hook_types:
-  - pre-commit
-  - pre-push
-  - commit-msg
+    - pre-commit
+    - pre-push
+    - commit-msg
 default_stages:
-  - pre-commit
-  - manual
+    - pre-commit
+    - manual
 
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
-    hooks:
-        - id: fix-byte-order-marker
-        - id: check-case-conflict
-        - id: check-symlinks
-        - id: destroyed-symlinks
-        - id: check-yaml
-        - id: check-json
-        - id: check-toml
-        - id: end-of-file-fixer
-          exclude: 'schema.graphql'
-        - id: trailing-whitespace
-        - id: mixed-line-ending
-        - id: check-merge-conflict
-        - id: check-added-large-files
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v6.0.0
+      hooks:
+          - id: fix-byte-order-marker
+          - id: check-case-conflict
+          - id: check-symlinks
+          - id: destroyed-symlinks
+          - id: check-yaml
+          - id: check-json
+          - id: check-toml
+          - id: end-of-file-fixer
+            exclude: "schema.graphql"
+          - id: trailing-whitespace
+          - id: mixed-line-ending
+          - id: check-merge-conflict
+          - id: check-added-large-files
 
-  - repo: https://github.com/crate-ci/typos
-    rev: v1.45.1
-    hooks:
-      - id: typos
-      - id: typos
-        name: commit-msg-typos
-        stages: [commit-msg]
+    - repo: https://github.com/crate-ci/typos
+      rev: v1.45.1
+      hooks:
+          - id: typos
+          - id: typos
+            name: commit-msg-typos
+            stages: [commit-msg]
 
-  - repo: https://github.com/crate-ci/committed
-    rev: v1.1.11
-    hooks:
-    - id: committed
+    - repo: https://github.com/crate-ci/committed
+      rev: v1.1.11
+      hooks:
+          - id: committed
 
-  - repo: local
-    hooks:
-      - id: cargo-fmt
-        name: cargo fmt
-        entry: cargo fmt --
-        language: system
-        types: [rust]
-        pass_filenames: true
-        stages:
-            - pre-commit
-      - id: pretttier
-        name: pretttier
-        entry: pnpm run format-files
-        language: system
-        types: [svelte, javascript, ts, css, graphql]
-        pass_filenames: true
-        stages:
-            - pre-commit
+    - repo: local
+      hooks:
+          - id: cargo-fmt
+            name: cargo fmt
+            entry: cargo fmt --
+            language: system
+            types: [rust]
+            pass_filenames: true
+            stages:
+                - pre-commit
+          - id: pretttier
+            name: pretttier
+            entry: pnpm run format-files
+            language: system
+            types: [svelte, javascript, ts, css, graphql]
+            pass_filenames: true
+            stages:
+                - pre-commit
 
-  - repo: local
-    hooks:
-      - id: cargo-clippy
-        name: cargo clippy
-        entry: cargo clippy -- -D warnings
-        language: system
-        pass_filenames: false
-        types: [rust]
-        stages:
-          - pre-push
+    - repo: local
+      hooks:
+          - id: cargo-clippy
+            name: cargo clippy
+            entry: cargo clippy -- -D warnings
+            language: system
+            pass_filenames: false
+            types: [rust]
+            stages:
+                - pre-push

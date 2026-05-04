@@ -1,0 +1,5 @@
+mutation DeleteFilesystemLibraryMutation(
+    $input: DeleteFilesystemLibraryInput!
+) {
+    deleteFilesystemLibrary(input: $input)
+}

@@ -1,0 +1,9 @@
+query FilesystemLibrariesQuery {
+    filesystemLibraries {
+        id
+        path
+        displayName
+        createdAt
+        updatedAt
+    }
+}

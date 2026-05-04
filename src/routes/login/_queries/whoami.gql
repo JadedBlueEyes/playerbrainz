@@ -1,0 +1,10 @@
+query WhoamiQuery {
+    whoami {
+        id
+        slug
+        displayName
+        admin
+        createdAt
+        updatedAt
+    }
+}

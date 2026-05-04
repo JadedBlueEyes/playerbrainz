@@ -1,0 +1,11 @@
+mutation UpdateFilesystemLibraryMutation(
+    $input: UpdateFilesystemLibraryInput!
+) {
+    updateFilesystemLibrary(input: $input) {
+        id
+        path
+        displayName
+        createdAt
+        updatedAt
+    }
+}
