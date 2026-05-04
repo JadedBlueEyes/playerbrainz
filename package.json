@@ -15,7 +15,7 @@
         "test": "npm run test:unit -- --run && npm run test:e2e",
         "test:unit": "vitest",
         "format": "prettier --write .",
-        "format-files": "prettier --write"
+        "format-files": "prettier --write --ignore-unknown"
     },
     "devDependencies": {
         "@playwright/test": "^1.58.2",
