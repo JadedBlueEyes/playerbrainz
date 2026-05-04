@@ -71,6 +71,14 @@ impl UserManagementMutation {
 
     #[graphql(guard = "AdminGuard")]
     pub async fn delete_user(&self, ctx: &Context<'_>, input: DeleteUserInput) -> Result<bool> {
+        let session = ctx
+            .data::<playerbrainz_entities::session::Model>()
+            .expect("to be logged in");
+
+        if session.user_id == input.id {
+            return Err(async_graphql::Error::new("You cannot delete your own user"));
+        }
+
         let db = ctx.data::<DatabaseConnection>()?;
         let result = user::Entity::delete_by_id(input.id).exec(db).await?;
         Ok(result.rows_affected > 0)
