@@ -1,0 +1,17 @@
+mutation CreateUser(
+    $displayName: String!
+    $slug: String!
+    $admin: Boolean!
+    $password: String!
+) {
+    createUser(
+        input: {
+            displayName: $displayName
+            slug: $slug
+            admin: $admin
+            password: $password
+        }
+    ) {
+        id
+    }
+}

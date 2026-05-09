@@ -1,0 +1,17 @@
+mutation UpdateUser(
+    $id: Int!
+    $displayName: String
+    $slug: String
+    $admin: Boolean
+) {
+    updateUser(
+        input: {
+            id: $id
+            displayName: $displayName
+            slug: $slug
+            admin: $admin
+        }
+    ) {
+        id
+    }
+}

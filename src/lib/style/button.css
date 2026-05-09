@@ -1,36 +1,38 @@
-button {
+button,
+.button {
     padding: 0.55rem 0.75rem;
     border: none;
     border-radius: 0.4rem;
-}
+    display: inline-block;
 
-button.primary {
-    color: white;
-    background-color: var(--primary-color);
-}
-button.primary:hover {
-    background-color: oklch(from var(--primary-color) calc(l + 0.08) c h);
-}
+    &.primary {
+        color: white;
+        background-color: var(--primary-color);
+    }
+    &.primary:hover {
+        background-color: oklch(from var(--primary-color) calc(l + 0.08) c h);
+    }
 
-button.primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
+    &.primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 
-button.secondary {
-    background: #e8e8e8;
-    color: #111;
-}
+    &.secondary {
+        background: #e8e8e8;
+        color: #111;
+    }
 
-button.secondary:hover {
-    background: #dedede;
-}
+    &.secondary:hover {
+        background: #dedede;
+    }
 
-button.danger {
-    background: var(--error-color);
-    color: white;
-}
+    &.danger {
+        background: var(--error-color);
+        color: white;
+    }
 
-button.danger:hover {
-    background: oklch(from var(--error-color) calc(l + 0.06) c h);
+    &.danger:hover {
+        background: oklch(from var(--error-color) calc(l + 0.06) c h);
+    }
 }
