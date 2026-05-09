@@ -21,7 +21,9 @@ pub async fn indexer_task(db: &DatabaseConnection) -> Result<(), Box<dyn std::er
             watcher
                 .watch(&library.path, RecursiveMode::Recursive)
                 .unwrap();
-            read_directory(&library.path, &tx);
+            if option_env!("SKIP_INITIAL_INDEX").is_none() {
+                read_directory(&library.path, &tx);
+            }
         }
         watch(tx, &shutdown::STOPPING, watcher_rx);
     })
