@@ -1,27 +1,28 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
-    import { WhoamiQueryStore } from "$houdini";
 
-    let { data, form } = $props();
+    import type { PageData } from "./$houdini";
+    import type { PageProps, RouteParams, ActionData } from "./$types";
 
-    const whoamiStore = new WhoamiQueryStore();
+    let {
+        data,
+        params,
+        form,
+    }: { data: PageData; params: RouteParams; form: ActionData } = $props();
+
+    let { WhoamiQuery: whoami } = $derived(data);
 
     let whoamiError = $derived(
-        $whoamiStore.errors?.map((e) => e.message).join(", "),
+        $whoami.errors?.map((e) => e.message).join(", "),
     );
-
-    $effect(() => {
-        if (data?.token) {
-            whoamiStore.fetch({ policy: "NetworkOnly" });
-        }
-    });
 </script>
 
 <form method="POST" use:enhance>
     <h2>Login</h2>
 
-    {#if form?.errorMessage}
-        <p class="error">{form.errorMessage}</p>
+    {#if form?.errors}
+        {@const errorMessage = form.errors?.map((e) => e.message).join(", ")}
+        <p class="error">{errorMessage}</p>
     {/if}
 
     <div class="field">
@@ -42,9 +43,9 @@
         <p class="error" style="margin-top: 1rem;">Error: {whoamiError}</p>
     {/if}
 
-    {#if $whoamiStore.data}
+    {#if $whoami.data}
         <pre style="margin-top: 1rem; overflow-x: auto;">{JSON.stringify(
-                $whoamiStore.data,
+                $whoami.data.whoami,
                 null,
                 2,
             )}</pre>

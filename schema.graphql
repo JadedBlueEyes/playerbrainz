@@ -36,11 +36,27 @@ type FilesystemLibrary {
   updatedAt: DateTime!
 }
 
+input LoginInput {
+  password: String!
+  slug: String!
+}
+
+type LoginPayload {
+  token: String!
+}
+
 type Mutation {
   createFilesystemLibrary(input: CreateFilesystemLibraryInput!): FilesystemLibrary!
   createUser(input: CreateUserInput!): User!
   deleteFilesystemLibrary(input: DeleteFilesystemLibraryInput!): Boolean!
   deleteUser(input: DeleteUserInput!): Boolean!
+
+  """
+  Log in with slug and password.
+  
+  Returns a bearer token that can be used as `Authorization: Bearer <token>`.
+  """
+  login(input: LoginInput!): LoginPayload!
   updateFilesystemLibrary(input: UpdateFilesystemLibraryInput!): FilesystemLibrary!
   updateUser(input: UpdateUserInput!): User!
 }

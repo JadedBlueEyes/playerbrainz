@@ -8,6 +8,7 @@ pub use query::UtilQuery;
 use async_graphql::MergedObject;
 
 use crate::graph::{
+    auth::AuthMutation,
     fs_libraries::{FsLibraryMutation, FsLibraryQuery},
     users::{mutation::UserManagementMutation, query::UserManagementQuery},
 };
@@ -16,4 +17,8 @@ use crate::graph::{
 pub struct Query(pub FsLibraryQuery, pub UtilQuery, pub UserManagementQuery);
 
 #[derive(MergedObject, Default)]
-pub struct Mutation(pub FsLibraryMutation, pub UserManagementMutation);
+pub struct Mutation(
+    pub AuthMutation,
+    pub FsLibraryMutation,
+    pub UserManagementMutation,
+);

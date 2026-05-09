@@ -1,34 +1,34 @@
 import { fail } from "@sveltejs/kit";
 import type { Actions } from "./$types";
+import { LoginStore } from "$houdini";
 
 export const actions = {
-    default: async ({ request, cookies }) => {
+    default: async (event) => {
+        const { request, cookies } = event;
+
         const data = await request.formData();
-        const slug = data.get("slug");
-        const password = data.get("password");
+
+        const slug = data.get("slug")?.toString();
+        const password = data.get("password")?.toString();
 
         if (!slug || !password) {
-            return fail(400, { errorMessage: "Missing slug or password" });
+            return fail(400, {
+                errors: [{ message: "Missing slug or password" }],
+            });
         }
 
         try {
-            const res = await fetch("http://localhost:3030/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ slug, password }),
-            });
-
-            if (!res.ok) {
-                return fail(res.status, {
-                    errorMessage: "Invalid username or password",
+            let login = new LoginStore();
+            let res = await login.mutate({ slug, password }, { event });
+            if (res.errors) {
+                return fail(400, {
+                    errors: res.errors,
                 });
             }
 
-            const result = await res.json();
+            const result = res.data?.login;
 
-            if (result.token) {
+            if (result?.token) {
                 cookies.set("token", result.token, {
                     path: "/",
                     httpOnly: true,
@@ -37,11 +37,13 @@ export const actions = {
                 });
             } else {
                 return fail(500, {
-                    errorMessage: "Login failed: no token received",
+                    errors: [{ message: "Login failed: no token received" }],
                 });
             }
         } catch (error) {
-            return fail(500, { errorMessage: "Internal server error" });
+            return fail(500, {
+                errors: [{ message: "Internal server error" }],
+            });
         }
 
         return { success: true };

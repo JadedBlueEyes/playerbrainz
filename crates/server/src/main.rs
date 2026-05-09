@@ -2,7 +2,7 @@ mod discovery_endpoint;
 mod error;
 mod graph;
 mod indexer;
-mod login;
+
 mod shutdown;
 
 use async_graphql::{EmptySubscription, Schema, dataloader::DataLoader, http::GraphiQLSource};
@@ -10,7 +10,7 @@ use axum::{
     Router,
     extract::{Extension, State},
     response::IntoResponse,
-    routing::{get, post},
+    routing::get,
 };
 use axum_extra::{
     TypedHeader,
@@ -22,7 +22,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use playerbrainz_entities::{User, session, user};
 
-use crate::{discovery_endpoint::discovery, login::login};
+use crate::discovery_endpoint::discovery;
 use crate::{
     graph::{Mutation, Query},
     shutdown::shutdown_signal,
@@ -95,7 +95,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/.well-known/playerbrainz/client", get(discovery))
         .route("/.well-known/playerbrainz/server", get(discovery))
         .route("/graphql", get(graphiql).post(graphql_handler))
-        .route("/login", post(login))
         .layer(Extension(schema))
         .layer(
             tower_http::cors::CorsLayer::new()

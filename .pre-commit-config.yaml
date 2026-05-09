@@ -20,6 +20,7 @@ repos:
           - id: end-of-file-fixer
             exclude: "schema.graphql"
           - id: trailing-whitespace
+            exclude: "schema.graphql"
           - id: mixed-line-ending
           - id: check-merge-conflict
           - id: check-added-large-files
@@ -55,7 +56,11 @@ repos:
             pass_filenames: true
             stages:
                 - pre-commit
-            exclude: ".github/workflows/release.yml"
+            exclude: |
+                (?x)^(
+                    .github/workflows/release.yml|
+                    schema.graphql
+                )$
 
     - repo: local
       hooks:
