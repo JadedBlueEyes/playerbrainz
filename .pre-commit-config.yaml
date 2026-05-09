@@ -55,6 +55,7 @@ repos:
             pass_filenames: true
             stages:
                 - pre-commit
+            exclude: ".github/workflows/release.yml"
 
     - repo: local
       hooks:

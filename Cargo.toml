@@ -2,5 +2,19 @@
 resolver = "2"
 members = ["crates/*"]
 
+[workspace.package]
+repository = "https://github.com/JadedBlueEyes/playerbrainz"
+
 [workspace.dependencies.sea-orm]
 version = "2.0.0-rc.38"
+
+[workspace.metadata.release]
+sign-commit = true
+sign-tag = true
+publish = false
+tag-name = "{{crate_name}}-v{{version}}"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"

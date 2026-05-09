@@ -2451,7 +2451,7 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 
 [[package]]
 name = "playerbrainz-entities"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "chrono",
  "sea-orm",
@@ -2463,7 +2463,7 @@ dependencies = [
 
 [[package]]
 name = "playerbrainz-scanner"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "assign",
  "clap",
@@ -2478,7 +2478,7 @@ dependencies = [
 
 [[package]]
 name = "playerbrainz-server"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "anyhow",
  "async-graphql",
