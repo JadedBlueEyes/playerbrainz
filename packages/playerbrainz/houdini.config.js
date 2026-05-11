@@ -1,17 +1,14 @@
 /// <references types="houdini-svelte">
 let env = globalThis?.process?.env ?? (await import("$env/dynamic/public")).env;
 
-let discovery_endpoint = new URL(
-    "/.well-known/playerbrainz/client",
-    env.PUBLIC_PLAYERBRAINZ_SERVER || "http://localhost:3030/",
-);
+let base = env.PUBLIC_PLAYERBRAINZ_SERVER || "http://localhost:3030/";
+
+let discovery_endpoint = new URL("/.well-known/playerbrainz/client", base);
+
 let res = await fetch(discovery_endpoint);
 let json = await res.json();
 
-let graph_endpoint = new URL(
-    json.graph_endpoint,
-    env.PUBLIC_PLAYERBRAINZ_SERVER,
-);
+let graph_endpoint = new URL(json.graph_endpoint, base);
 
 /** @type {import('houdini').ConfigFile} */
 const config = {
