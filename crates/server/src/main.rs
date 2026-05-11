@@ -20,6 +20,8 @@ use axum_extra::{
     headers::{Authorization, authorization::Bearer},
     typed_header::TypedHeaderRejection,
 };
+
+use playerbrainz_signatures::key::PublicKey;
 use sea_orm::{Database, DatabaseConnection, EntityTrait};
 use snafu::{ResultExt, Snafu};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -127,9 +129,11 @@ async fn async_main() -> Result<()> {
 
     startup::seed_admin_user(db).await.context(StartUpSnafu)?;
 
-    let _key = startup::ensure_server_key(db, &config)
+    let key = startup::ensure_server_key(db, &config)
         .await
         .context(StartUpSnafu)?;
+    let key_id = PublicKey::Ed25519(key.pk).key_id();
+    println!("Server key: {key_id}");
 
     let app = Router::new()
         .route("/", get(serve_index))

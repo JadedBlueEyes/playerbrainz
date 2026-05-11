@@ -2,7 +2,7 @@ use std::{fmt, str::FromStr};
 
 use snafu::{Snafu, ensure};
 
-use crate::algorithm::{self, KeyAlgorithm};
+use crate::key::{self, KeyAlgorithm};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct KeyId(String);
@@ -27,7 +27,7 @@ impl KeyId {
             return MissingColonSnafu.fail();
         };
         ensure!(
-            algorithm::KeyAlgorithm::from_str(a).is_ok(),
+            key::KeyAlgorithm::from_str(a).is_ok(),
             InvalidAlgorithmSnafu { algorithm: a }
         );
         ensure!(!b.is_empty(), MissingVersionSnafu);
@@ -38,7 +38,7 @@ impl KeyId {
             unreachable!("Should be valid once constructed")
         };
         (
-            algorithm::KeyAlgorithm::from_str(a).expect("should be valid once constructed"),
+            key::KeyAlgorithm::from_str(a).expect("should be valid once constructed"),
             b,
         )
     }

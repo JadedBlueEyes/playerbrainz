@@ -40,3 +40,4 @@ strum = { version = "0.28.0", features = ["derive"] }
 figment = { version = "0.10.19", features = ["env", "toml"] }
 url = { version = "2.5.8", features = ["serde"] }
 ed25519-compact = { version = "2.2.0", features = ["traits"] }
+httpsig = "0.0.24"
