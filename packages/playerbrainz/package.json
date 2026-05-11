@@ -1,0 +1,38 @@
+{
+    "name": "playerbrainz",
+    "private": true,
+    "version": "0.0.1",
+    "type": "module",
+    "scripts": {
+        "dev": "vite dev",
+        "houdini": "houdini",
+        "build": "vite build",
+        "preview": "vite preview",
+        "prepare": "svelte-kit sync || echo ''",
+        "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+        "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+        "test:e2e": "playwright test",
+        "test": "npm run test:unit -- --run && npm run test:e2e",
+        "test:unit": "vitest"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.58.2",
+        "@sveltejs/adapter-auto": "^7.0.0",
+        "@sveltejs/kit": "^2.50.2",
+        "@sveltejs/vite-plugin-svelte": "^6.2.4",
+        "@vitest/browser-playwright": "^4.1.0",
+        "houdini": "^2.0.0-go.15",
+        "houdini-svelte": "^3.0.0-go.15",
+        "playwright": "^1.58.2",
+        "svelte": "^5.51.0",
+        "svelte-check": "^4.4.2",
+        "typescript": "^5.9.3",
+        "vite": "^7.3.1",
+        "vitest": "^4.1.0",
+        "vitest-browser-svelte": "^2.0.2"
+    },
+    "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264",
+    "engines": {
+        "node": ">=26.1.0"
+    }
+}
