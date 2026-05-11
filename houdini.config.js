@@ -24,6 +24,30 @@ const config = {
             forceRunesMode: true,
         },
     },
+    scalars: {
+        DateTime: {
+            type: "Date",
+            /** @param {Date} val */
+            marshal(val) {
+                return date && date.toISOString();
+            },
+            /** @param {string} val */
+            unmarshal(val) {
+                return val ? new Date(val) : null;
+            },
+            // type: 'Temporal.PlainDateTime',
+            // /** @param {Temporal.PlainDateTime} val */
+            // marshal(val) {
+            //     // console.log(val)
+            //     return date && date.toString()
+            // },
+            // /** @param {string} val */
+            // unmarshal(val) {
+            //     // console.log(val)
+            //     return val ? Temporal.PlainDateTime.from(val) : null
+            // }
+        },
+    },
 };
 
 export default config;

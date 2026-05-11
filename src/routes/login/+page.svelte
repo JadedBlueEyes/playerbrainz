@@ -15,6 +15,7 @@
     let whoamiError = $derived(
         $whoami.errors?.map((e) => e.message).join(", "),
     );
+    $effect(() => console.log($whoami.data?.whoami));
 </script>
 
 <form method="POST" use:enhance>
