@@ -12,3 +12,5 @@ uuid = { version = "1.0", features = ["serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 tokio = { version = "1.0", features = ["macros"] }
 serde_json = { version = "1.0.149", default-features = false }
+
+# playerbrainz-signatures = { path = "../signatures",  }

@@ -13,6 +13,10 @@ pub struct Model {
 
     pub created_at: DateTimeWithTimeZone,
     pub updated_at: DateTimeWithTimeZone,
+
+    #[sea_orm(has_many)]
+    pub remote_server_key_authorizations:
+        HasMany<super::remote_server_key_library_authorizations::Entity>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}
