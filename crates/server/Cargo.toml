@@ -39,3 +39,5 @@ rand = "0.10.1"
 base64 = "0.22.1"
 axum-extra = { version = "0.12.6", features = ["cookie", "typed-header"] }
 strum = { version = "0.28.0", features = ["derive"] }
+figment = { version = "0.10.19", features = ["env", "toml"] }
+url = { version = "2.5.8", features = ["serde"] }

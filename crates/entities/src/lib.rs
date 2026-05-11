@@ -14,7 +14,7 @@ pub use filesystem_libraries::Entity as FsLibrary;
 pub use remote_server_key_library_authorizations::Entity as RemoteServerKeyLibraryAuthorization;
 pub use remote_server_keys::Entity as RemoteServerKey;
 pub use remote_servers::Entity as RemoteServer;
-pub use server_keypairs::Entity as RemoteServerKeypair;
+pub use server_keypairs::Entity as ServerKeypair;
 pub use session::Entity as Session;
 pub use user::Entity as User;
 

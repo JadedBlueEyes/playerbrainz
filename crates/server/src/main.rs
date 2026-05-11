@@ -2,7 +2,10 @@ mod discovery_endpoint;
 mod graph;
 mod indexer;
 
+mod config;
 mod shutdown;
+
+use std::process::exit;
 
 use async_graphql::{EmptySubscription, Schema, dataloader::DataLoader, http::GraphiQLSource};
 use axum::{
@@ -22,7 +25,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use playerbrainz_entities::{User, session, user};
 
-use crate::discovery_endpoint::discovery;
+use crate::{config::config, discovery_endpoint::discovery};
 use crate::{
     graph::{Mutation, Query},
     shutdown::shutdown_signal,
@@ -74,17 +77,29 @@ enum Error {
         addr: String,
         source: std::io::Error,
     },
+
+    #[snafu(display("Bad configuration: {}", source))]
+    Config { source: Box<figment::Error> },
 }
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() {
+    let Err(e) = async_main().await else {
+        return;
+    };
+    eprint!("{e}");
+    exit(1)
+}
+
+async fn async_main() -> Result<()> {
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
         .with(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    let database_url =
-        std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://music.db?mode=rwc".to_string());
+    let config = config().context(ConfigSnafu)?;
+
+    let database_url = config.database_url.clone();
 
     let db = Database::connect(database_url.clone())
         .await
@@ -131,14 +146,12 @@ async fn main() -> Result<()> {
         )
         .with_state(db.clone());
 
-    let addr = "0.0.0.0:3030";
-    let listener = tokio::net::TcpListener::bind(addr)
+    let addr = config.listen_addr.clone();
+    let listener = tokio::net::TcpListener::bind(&addr)
         .await
-        .context(BindTcpListenerSnafu {
-            addr: addr.to_string(),
-        })?;
+        .context(BindTcpListenerSnafu { addr })?;
 
-    let indexer = indexer::indexer_task(db);
+    let indexer = indexer::indexer_task(db, config.clone());
     let server = axum::serve(listener, app).with_graceful_shutdown(shutdown_signal());
 
     let (indexer_result, server_result) = tokio::join!(indexer, server);

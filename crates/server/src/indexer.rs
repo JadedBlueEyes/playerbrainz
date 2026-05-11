@@ -7,9 +7,12 @@ use sea_orm::{
 use std::time::Duration;
 use tokio::sync::mpsc::{self, UnboundedReceiver};
 
-use crate::shutdown;
+use crate::{config::Config, shutdown};
 
-pub async fn indexer_task(db: &DatabaseConnection) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn indexer_task(
+    db: &DatabaseConnection,
+    config: Config,
+) -> Result<(), Box<dyn std::error::Error>> {
     let (tx, rx) = mpsc::unbounded_channel::<ScanItem>();
     let libraries = filesystem_libraries::Entity::find().all(db).await?;
 
@@ -21,7 +24,7 @@ pub async fn indexer_task(db: &DatabaseConnection) -> Result<(), Box<dyn std::er
             watcher
                 .watch(&library.path, RecursiveMode::Recursive)
                 .unwrap();
-            if option_env!("SKIP_INITIAL_INDEX").is_none() {
+            if !config.skip_initial_index {
                 read_directory(&library.path, &tx);
             }
         }
