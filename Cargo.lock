@@ -303,12 +303,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "71938f30533e4d95a6d17aa530939da3842c2ab6f4f84b9dae68447e4129f74a"
 
 [[package]]
-name = "assign"
-version = "1.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5f093eed78becd229346bf859eec0aa4dd7ddde0757287b2b4107a1f09c80002"
-
-[[package]]
 name = "async-graphql"
 version = "7.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1131,12 +1125,6 @@ dependencies = [
  "quote",
  "syn 2.0.117",
 ]
-
-[[package]]
-name = "dotenv"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
 
 [[package]]
 name = "dotenvy"
@@ -2666,7 +2654,6 @@ dependencies = [
 name = "playerbrainz-scanner"
 version = "0.0.2"
 dependencies = [
- "assign",
  "clap",
  "notify-debouncer-full",
  "snafu",
@@ -2687,7 +2674,6 @@ dependencies = [
  "axum-extra",
  "base64",
  "chrono",
- "dotenv",
  "ed25519-compact",
  "figment",
  "password-auth",
@@ -2713,7 +2699,6 @@ name = "playerbrainz-signatures"
 version = "0.0.1"
 dependencies = [
  "base64",
- "bytes",
  "ecdsa",
  "ed25519-compact",
  "hmac",
