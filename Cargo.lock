@@ -2611,7 +2611,6 @@ dependencies = [
 name = "playerbrainz-server"
 version = "0.0.2"
 dependencies = [
- "anyhow",
  "async-graphql",
  "async-graphql-axum",
  "axum",
@@ -2627,6 +2626,7 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
+ "snafu",
  "strum 0.28.0",
  "symphonia",
  "tokio",
