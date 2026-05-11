@@ -11,7 +11,6 @@ pub struct Model {
     pub server_href: String,
 
     pub algorithm: String,
-    pub public_key: Vec<u8>,
     pub private_key: Vec<u8>,
 
     pub created_at: DateTimeWithTimeZone,
@@ -21,3 +20,15 @@ pub struct Model {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(DeriveIntoActiveModel)]
+#[sea_orm(
+    active_model = "ActiveModel",
+    set(created_at = "chrono::Utc::now().fixed_offset()")
+)]
+pub struct NewServerKeypair {
+    pub server_href: String,
+
+    pub algorithm: String,
+    pub private_key: Vec<u8>,
+}

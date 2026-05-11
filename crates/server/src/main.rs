@@ -4,6 +4,7 @@ mod indexer;
 
 mod config;
 mod shutdown;
+mod startup;
 
 use std::process::exit;
 
@@ -19,13 +20,17 @@ use axum_extra::{
     headers::{Authorization, authorization::Bearer},
     typed_header::TypedHeaderRejection,
 };
-use sea_orm::{Database, DatabaseConnection, EntityTrait, IntoActiveModel, SqlErr};
+use sea_orm::{Database, DatabaseConnection, EntityTrait};
 use snafu::{ResultExt, Snafu};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use playerbrainz_entities::{User, session, user};
+use playerbrainz_entities::{session, user};
 
-use crate::{config::config, discovery_endpoint::discovery};
+use crate::{
+    config::{ConfigError, config},
+    discovery_endpoint::discovery,
+    startup::StartupError,
+};
 use crate::{
     graph::{Mutation, Query},
     shutdown::shutdown_signal,
@@ -69,9 +74,6 @@ enum Error {
     #[snafu(display("Unable to sync database schema: {}", source))]
     SyncDatabaseSchema { source: sea_orm::DbErr },
 
-    #[snafu(display("Unable to seed admin user: {}", source))]
-    SeedAdminUser { source: sea_orm::DbErr },
-
     #[snafu(display("Unable to bind server listener on '{}': {}", addr, source))]
     BindTcpListener {
         addr: String,
@@ -79,7 +81,9 @@ enum Error {
     },
 
     #[snafu(display("Bad configuration: {}", source))]
-    Config { source: Box<figment::Error> },
+    Config { source: ConfigError },
+    #[snafu(display("Failed to start up: {}", source))]
+    StartUp { source: StartupError },
 }
 
 #[tokio::main]
@@ -97,7 +101,7 @@ async fn async_main() -> Result<()> {
         .with(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    let config = config().context(ConfigSnafu)?;
+    let config = dbg!(config().context(ConfigSnafu)?);
 
     let database_url = config.database_url.clone();
 
@@ -121,7 +125,11 @@ async fn async_main() -> Result<()> {
         .finish();
     let db = &db;
 
-    seed_admin_user(db).await?;
+    startup::seed_admin_user(db).await.context(StartUpSnafu)?;
+
+    let _key = startup::ensure_server_key(db, &config)
+        .await
+        .context(StartUpSnafu)?;
 
     let app = Router::new()
         .route("/", get(serve_index))
@@ -170,19 +178,4 @@ If you just want to play music, you probably shouldn't be here!
 
 API docs at /graphql
 "
-}
-
-async fn seed_admin_user(db: &DatabaseConnection) -> Result<()> {
-    if let Err(e) = User::insert(user::ActiveModel {
-        id: sea_orm::ActiveValue::Set(0),
-        ..user::NewUser {
-            display_name: None,
-            admin: true,
-            slug: "admin".to_string(),
-            password: "$argon2i$v=19$m=65536,t=1,p=1$c29tZXNhbHQAAAAAAAAAAA$+r0d29hqEB0yasKr55ZgICsQGSkl0v0kgwhd+U3wyRo".to_string(), // an argon2 hash of "password"
-        }.into_active_model()
-    }).exec(db).await && e.sql_err().filter(|e| matches!(e, SqlErr::UniqueConstraintViolation(_))).is_none() {
-        return Err(e).context(SeedAdminUserSnafu)
-    }
-    Ok(())
 }

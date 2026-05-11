@@ -1,7 +1,16 @@
 use httpsig::prelude::{AlgorithmName as HttpSigAlgorithmName, HttpSigError};
 
 #[derive(
-    Clone, Copy, Debug, Eq, PartialEq, Hash, strum::Display, strum::AsRefStr, strum::EnumString,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    PartialEq,
+    Hash,
+    strum::Display,
+    strum::AsRefStr,
+    strum::EnumString,
+    strum::VariantArray,
 )]
 #[strum(serialize_all = "snake_case")]
 pub enum KeyAlgorithm {
