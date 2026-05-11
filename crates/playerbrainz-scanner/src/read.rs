@@ -1,45 +1,52 @@
-use std::{fs::File, path::Path};
+use std::{
+    fs::File,
+    path::{Path, PathBuf},
+};
+
+use snafu::{ResultExt, Snafu};
 use symphonia::core::{
     formats::{FormatOptions, probe::Hint},
     io::MediaSourceStream,
     meta::{MetadataOptions, RawValue, StandardTag, Tag},
 };
-use thiserror::Error;
 use tracing::warn;
 use uuid::Uuid;
 
 use crate::structs::{MasterRecordingMetadata, ScannedMedia};
 
-/// Errors that can occur during scanning
-#[derive(Debug, Error)]
-pub enum ScanError {
-    /// IO error
-    #[error("IO error: {0}")]
-    Io(#[from] std::io::Error),
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 
-    #[error("Unsupported feature: {0}")]
-    SymphoniaUnsupported(&'static str),
+/// Errors that can occur during scanning / metadata probing.
+#[derive(Debug, Snafu)]
+pub enum Error {
+    #[snafu(display("Unable to open file '{}': {}", path.display(), source))]
+    OpenFile {
+        path: PathBuf,
+        source: std::io::Error,
+    },
+
+    #[snafu(display(
+        "Unsupported audio format/feature '{}' for file '{}'",
+        feature,
+        path.display()
+    ))]
+    SymphoniaUnsupported {
+        path: PathBuf,
+        feature: &'static str,
+    },
+
+    #[snafu(display(
+        "Unable to probe audio metadata for file '{}': {}",
+        path.display(),
+        source
+    ))]
+    SymphoniaProbe {
+        path: PathBuf,
+        source: symphonia::core::errors::Error,
+    },
 }
 
-impl From<symphonia::core::errors::Error> for ScanError {
-    fn from(value: symphonia::core::errors::Error) -> Self {
-        match value {
-            symphonia::core::errors::Error::IoError(error) => error.into(),
-            symphonia::core::errors::Error::DecodeError(_) => {
-                unreachable!("Should not be decoding in scanner")
-            }
-            symphonia::core::errors::Error::SeekError(_) => {
-                unreachable!("Should not be seeking in scanner")
-            }
-            symphonia::core::errors::Error::Unsupported(f) => Self::SymphoniaUnsupported(f),
-            symphonia::core::errors::Error::LimitError(_) => todo!(),
-            symphonia::core::errors::Error::ResetRequired => unreachable!(),
-            _ => todo!(),
-        }
-    }
-}
-
-/// This is a workaround for the recording ID being encoded weirdly in MP3s
+/// This is a workaround for the recording ID being encoded weirdly in MP3s.
 pub fn get_musicbrainz_recording_id_from_raw_tag(tag: &Tag) -> Option<Uuid> {
     if tag.raw.key == "UFID"
         && let Some(sub_fields) = &tag.raw.sub_fields
@@ -60,10 +67,14 @@ pub fn get_musicbrainz_recording_id_from_raw_tag(tag: &Tag) -> Option<Uuid> {
     None
 }
 
-pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata, ScanError> {
+pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata> {
+    let path_buf = path.to_path_buf();
+
     let mut hint = Hint::new();
 
-    let source = Box::new(File::open(path)?);
+    let source = Box::new(File::open(path).context(OpenFileSnafu {
+        path: path_buf.clone(),
+    })?);
 
     // Provide the file extension as a hint.
     if let Some(extension) = path.extension()
@@ -86,8 +97,22 @@ pub(crate) fn try_read_mastering(path: &Path) -> Result<MasterRecordingMetadata,
 
     let metadata_opts: MetadataOptions = Default::default();
 
-    let mut probed =
-        symphonia::default::get_probe().probe(&hint, mss, format_opts, metadata_opts)?;
+    let probe_result =
+        symphonia::default::get_probe().probe(&hint, mss, format_opts, metadata_opts);
+
+    let mut probed = match probe_result {
+        Ok(probed) => probed,
+        Err(symphonia::core::errors::Error::Unsupported(feature)) => {
+            return SymphoniaUnsupportedSnafu {
+                path: path_buf,
+                feature,
+            }
+            .fail();
+        }
+        Err(source) => {
+            return Err(source).context(SymphoniaProbeSnafu { path: path_buf });
+        }
+    };
 
     res.format_short_name = Some(probed.format_info().short_name);
 

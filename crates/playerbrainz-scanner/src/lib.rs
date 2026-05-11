@@ -7,7 +7,7 @@ use tokio::sync::mpsc;
 use tracing::{error, info};
 use walkdir::{DirEntry, WalkDir};
 
-use crate::read::{ScanError, try_read_mastering};
+use crate::read::{Error as ScanError, try_read_mastering};
 pub use crate::structs::ScanItem;
 
 pub use notify_debouncer_full as notify;
@@ -128,7 +128,7 @@ pub fn read_directory(dir: impl AsRef<Path>, tx: &mpsc::UnboundedSender<ScanItem
                 continue;
             }
             Err(e) => {
-                if let ScanError::SymphoniaUnsupported(_f) = e {
+                if matches!(e, ScanError::SymphoniaUnsupported { .. }) {
                     // Ignore this, expected
                     continue;
                 }
