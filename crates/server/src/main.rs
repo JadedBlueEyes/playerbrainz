@@ -124,6 +124,7 @@ async fn async_main() -> Result<()> {
             crate::graph::fs_libraries::FsLibraryByIdLoader { db: db.clone() },
             tokio::spawn,
         ))
+        .data(config.clone())
         .finish();
     let db = &db;
 

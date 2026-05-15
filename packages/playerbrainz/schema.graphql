@@ -66,9 +66,20 @@ type Query {
   filesystemLibraryById(id: Int!): FilesystemLibrary
   filesystemLibraryByPath(path: String!): FilesystemLibrary
   hello: String!
+  serverInfo: Server!
   user(id: Int!): User
   users: [User!]!
   whoami: User!
+}
+
+type Server {
+  href: String!
+  publicKeys: [ServerPublicKey!]!
+}
+
+type ServerPublicKey {
+  content: String!
+  id: String!
 }
 
 input UpdateFilesystemLibraryInput {

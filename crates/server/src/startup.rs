@@ -49,7 +49,7 @@ pub async fn ensure_server_key(db: &DatabaseConnection, config: &Config) -> Resu
         .filter(
             Condition::any()
                 .add(server_keypairs::Column::ValidUntil.is_null())
-                .add(server_keypairs::Column::ValidUntil.lt(chrono::Utc::now().fixed_offset())),
+                .add(server_keypairs::Column::ValidUntil.gt(chrono::Utc::now().fixed_offset())),
         )
         .filter(server_keypairs::Column::CreatedAt.lte(chrono::Utc::now().fixed_offset()))
         .filter(
@@ -60,6 +60,7 @@ pub async fn ensure_server_key(db: &DatabaseConnection, config: &Config) -> Resu
                     .collect::<Vec<&str>>(),
             ),
         )
+        .filter(server_keypairs::Column::ServerHref.eq(config.href.as_str()))
         .one(db)
         .await
         .context(EnsureKeySnafu)?;
