@@ -12,7 +12,8 @@ use strum::IntoDiscriminant;
         strum::AsRefStr,
         strum::EnumString,
         strum::VariantArray
-    )
+    ),
+    strum(serialize_all = "snake_case")
 )]
 #[strum(serialize_all = "snake_case")]
 pub enum PublicKey {
