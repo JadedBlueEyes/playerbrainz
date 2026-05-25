@@ -1,10 +1,4 @@
-mod discovery_endpoint;
-mod graph;
-mod indexer;
-
-mod config;
-mod shutdown;
-mod startup;
+use playerbrainz_server::*;
 
 use std::process::exit;
 
@@ -47,11 +41,27 @@ async fn graphql_handler(
     Extension(schema): Extension<Schema<Query, Mutation, EmptySubscription>>,
     auth: std::result::Result<TypedHeader<Authorization<Bearer>>, TypedHeaderRejection>,
     // jar: CookieJar,
-    req: async_graphql_axum::GraphQLRequest,
+    signed: http_signatures::SignedGraphQLRequest,
 ) -> async_graphql_axum::GraphQLResponse {
     let token = auth.as_ref().ok().map(|h| h.token());
     // .or_else(|| jar.get("pb_token").map(|c| c.value()));
-    let mut req = req.into_inner();
+
+    let http_signatures::SignedGraphQLRequest {
+        signature,
+        request: mut req,
+    } = signed;
+
+    // Make signature verification status available to resolvers.
+    // Also log it at debug level so the types aren't "dead code" in this bin crate.
+    tracing::debug!(
+        signed = signature.is_verified(),
+        "GraphQL request signature status"
+    );
+    if let Some(v) = signature.verified() {
+        tracing::debug!(key_id = %v.key_id(), server_href = %v.server_href(), "GraphQL request signature verified");
+    }
+
+    req = req.data(signature);
 
     if let Some(token) = token
         && let Ok(Some(session)) = session::Entity::find_by_id(token).one(&db).await
@@ -112,6 +122,7 @@ async fn async_main() -> Result<()> {
         .context(DatabaseConnectSnafu {
             database_url: database_url.clone(),
         })?;
+
     // synchronizes database schema with entity definitions
     db.get_schema_registry("playerbrainz_entities::*")
         .sync(&db)
@@ -154,6 +165,9 @@ async fn async_main() -> Result<()> {
                     axum::http::header::CONTENT_TYPE,
                     axum::http::header::AUTHORIZATION,
                     axum::http::header::ACCEPT,
+                    axum::http::HeaderName::from_static("signature"),
+                    axum::http::HeaderName::from_static("signature-input"),
+                    axum::http::HeaderName::from_static("content-digest"),
                 ])
                 .allow_credentials(true),
         )

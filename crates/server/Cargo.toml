@@ -5,6 +5,11 @@ edition = "2024"
 
 repository.workspace = true
 
+[[bin]]
+name = "signed_request"
+test = false
+bench = false
+
 [dependencies]
 
 snafu = "0.9.0"
@@ -40,4 +45,14 @@ strum = { version = "0.28.0", features = ["derive"] }
 figment = { version = "0.10.19", features = ["env", "toml"] }
 url = { version = "2.5.8", features = ["serde"] }
 ed25519-compact = { version = "2.2.0", features = ["traits"] }
-httpsig = "0.0.24"
+httpsig.workspace = true
+httpsig-hyper.workspace = true
+http-body-util = { version = "0.1.3", features = ["full"] }
+bytes = "1.11.1"
+
+# Remote server discovery + GraphQL client
+cynic = { version = "3.13.2", features = ["http-reqwest"] }
+reqwest = { version = "0.13.3", default-features = false, features = ["json", "rustls"] }
+
+[build-dependencies]
+cynic-codegen = { version = "3" }

@@ -10,6 +10,9 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub server_key_id: String,
 
+    #[sea_orm(indexed)]
+    pub algorithm: String,
+
     pub public_key_bytes: Vec<u8>,
 
     pub first_seen: DateTimeWithTimeZone,

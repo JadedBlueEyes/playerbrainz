@@ -4,11 +4,13 @@ use playerbrainz_entities::{ServerKeypair, server_keypairs};
 use playerbrainz_signatures::KeyAlgorithm;
 use sea_orm::{ColumnTrait, Condition, DatabaseConnection, EntityTrait, QueryFilter};
 use std::str::FromStr;
+use strum::IntoDiscriminant;
 
 #[derive(SimpleObject)]
 pub struct ServerPublicKey {
     pub id: String,
     pub content: String,
+    pub algorithm: String,
 }
 
 pub struct Server {
@@ -45,6 +47,10 @@ impl Server {
                 let kp = ed25519_compact::KeyPair::from_seed(ed25519_compact::Seed::new(seed));
                 public_keys.push(ServerPublicKey {
                     id: playerbrainz_signatures::key::PublicKey::Ed25519(kp.pk).key_id(),
+                    algorithm: playerbrainz_signatures::key::PublicKey::Ed25519(kp.pk)
+                        .discriminant()
+                        .as_ref()
+                        .to_string(),
                     content: base64::engine::general_purpose::STANDARD.encode(kp.pk.as_ref()),
                 });
             }

@@ -78,6 +78,7 @@ type Server {
 }
 
 type ServerPublicKey {
+  algorithm: String!
   content: String!
   id: String!
 }

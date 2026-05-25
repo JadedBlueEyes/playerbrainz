@@ -2,7 +2,7 @@ use ed25519_compact::PublicKey as Ed25519PublicKey;
 use httpsig::prelude::{
     AlgorithmName as HttpSigAlgorithmName, HttpSigError, PublicKey as HttpSigPublicKey,
 };
-use strum::IntoDiscriminant;
+
 #[derive(Clone, Debug, strum::EnumDiscriminants)]
 #[strum_discriminants(
     name(KeyAlgorithm),
@@ -30,11 +30,7 @@ impl PublicKey {
         hasher.update(&bytes);
         let hash = hasher.finalize();
 
-        format!(
-            "{}:{}",
-            self.discriminant(),
-            &base64::engine::general_purpose::STANDARD_NO_PAD.encode(hash)
-        )
+        base64::engine::general_purpose::STANDARD_NO_PAD.encode(hash)
     }
 }
 

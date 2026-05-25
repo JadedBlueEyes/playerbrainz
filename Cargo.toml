@@ -7,6 +7,14 @@ repository = "https://github.com/JadedBlueEyes/playerbrainz"
 
 [workspace.dependencies.sea-orm]
 version = "2.0.0-rc.38"
+[workspace.dependencies.httpsig]
+version="0.0.24"
+# path="/Users/jade/Code/httpsig-rs/httpsig"
+# package="httpsig"
+[workspace.dependencies.httpsig-hyper]
+version="0.0.24"
+# path="/Users/jade/Code/httpsig-rs/httpsig-hyper"
+# package="httpsig-hyper"
 
 [workspace.metadata.release]
 sign-commit = true

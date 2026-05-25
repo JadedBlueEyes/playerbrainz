@@ -5,7 +5,7 @@ edition = "2024"
 repository.workspace = true
 
 [dependencies]
-httpsig = "0.0.24"
+httpsig.workspace = true
 strum = { version = "0.28.0", features = ["derive"] }
 
 
